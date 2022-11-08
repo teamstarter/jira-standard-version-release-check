@@ -114,6 +114,9 @@ async function checkRelease(line) {
 
     let subTasks = "";
     let subTasksReady = true;
+    let color = "\x1b[32m";
+
+    //SUB TASK
     if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
       for (const sub of issue.fields.subtasks) {
         const isReady =
@@ -121,11 +124,16 @@ async function checkRelease(line) {
           process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
         if (!isReady) {
           subTasksReady = false;
+          color = "\x1b[31m";
         }
-        subTasks += `[${isReady ? "👍" : "❌"}${sub.fields.status.name}]`;
+        subTasks +=
+          color +
+          `(${isReady ? "👍" : "❌"} ${sub.fields.status.name}: ${sub.key}) ` +
+          "\x1b[0m";
       }
     }
 
+    // 
     if (!issue) {
       return `[⁇ UNKNOWN US] ${line} `;
     }
@@ -133,7 +141,11 @@ async function checkRelease(line) {
     if (
       issue.fields.status.name !== process.env.JIRA_US_READY_TO_RELEASE_STATUS
     ) {
-      return `[❌ ${issue.fields.status.name}]${subTasks} ${line} `;
+      return `[${
+        issue.fields.status.name !== process.env.JIRA_US_RELEASE_STATUS
+          ? "🚀"
+          : "❌"
+      } ${issue.fields.status.name}: ${issue.key}]${subTasks}\x1b[36m${line}\x1b[0m `;
     }
 
     return `[${subTasksReady ? "✅" : "👎"} ${
