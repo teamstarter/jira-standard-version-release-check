@@ -1,11 +1,12 @@
 const fs = require("fs");
 const readline = require("readline");
-
+const { Version3Client } = require("jira.js");
 const dotenv = require("dotenv");
 const dotenvExpand = require("dotenv-expand");
-/**
- * Loads environment variables from project_path/.env file.
- */
+const getJiraUSFromText = require("./getJiraUSFromText");
+const standardVersion = require("standard-version");
+
+// Loads environment variables from project_path/.env file.
 dotenv.config();
 
 // When run for the unit/func tests, we do not expand the .env as it will lose
@@ -14,11 +15,6 @@ if (process.env.NODE_ENV !== "test") {
   const myEnv = dotenv.config();
   dotenvExpand.expand(myEnv);
 }
-
-const standardVersion = require("standard-version");
-const getJiraUSFromText = require("./getJiraUSFromText");
-
-const { Version3Client } = require("jira.js");
 
 if (!process.env.JIRA_ACCOUNT_EMAIL || !process.env.JIRA_ACCOUNT_TOKEN) {
   return console.error(
@@ -54,40 +50,44 @@ const client = new Version3Client({
 // }
 
 async function analyseRelease() {
-  // Start the interception
-  //   process.stdout.write = captureConsole;
+  // 1) Use standard version and creates in stout a changelog
+  // // Start the interception
+  // process.stdout.write = captureConsole;
 
-  //   await standardVersion({
-  //     noVerify: true,
-  //     infile: "./TESTCHANGELOG.md",
-  //     silent: false,
-  //     dryRun: false,
-  //   });
+  // await standardVersion({
+  //   noVerify: true,
+  //   infile: "./TESTCHANGELOG.md",
+  //   silent: false,
+  //   dryRun: false,
+  // });
 
-  // Release the interception of the console
-  //   process.stdout.write = outputOrigin;
+  // // Release the interception of the console
+  // process.stdout.write = outputOrigin;
+  // for (const line of readFile.split("\n")) {
+  //   const linee = await test(line);
+  //   console.log(linee);
+  // }
+  //
+
+  // 2) Use a local CHANGELOG.md file to test script in this repository
+  // without generating a changelog based on commit to this repository
   var user_file = "./CHANGELOG.md";
   var r = readline.createInterface({
     input: fs.createReadStream(user_file),
   });
   r.on("line", async function (line) {
-	const linee =  await test(line);
+    const linee = await test(line);
     console.log(linee);
   });
-
-//   for (const line of readFile.split("\n")) {
-//     const linee = await test(line);
-//     console.log(linee);
-//   }
+  //
 }
 
 async function test(text) {
+
   if (!text) {
     return text;
   }
-
   const issueId = getJiraUSFromText(text);
-
   if (!issueId) {
     if (text.search(/:\*\*/) !== -1) {
       return `[🚨 MISSING US NUMBER 🤬🫵] ${text}`;
