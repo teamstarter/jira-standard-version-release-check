@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const dotenvExpand = require("dotenv-expand");
 const getJiraUSFromText = require("./getJiraUSFromText");
 const standardVersion = require("standard-version");
+const { GetCurrentUser } = require("jira.js/out/version2/parameters");
 
 // Loads environment variables from project_path/.env file.
 dotenv.config();
@@ -39,60 +40,74 @@ const client = new Version3Client({
       apiToken: process.env.JIRA_ACCOUNT_TOKEN,
     },
   },
+  newErrorHandling: true,
 });
 
-// standard version do not provide a way to get the output
-// So we intercept it!
-// const interceptedContent = [];
-// const outputOrigin = process.stdout.write;
-// function captureConsole(data) {
-//   interceptedContent.push(data);
-// }
+async function getAuthUser() {
+  try {
+    return await client.myself.getCurrentUser();
+  } catch (err) {
+    return err;
+  }
+}
 
-async function analyseRelease() {
-  // 1) Use standard version and creates in stout a changelog
-  // // Start the interception
-  // process.stdout.write = captureConsole;
+async function useStandardVersion() {
+  // standard version do not provide a way to get the output
+  // So we intercept it!
+  const interceptedContent = [];
+  const outputOrigin = process.stdout.write;
+  function captureConsole(data) {
+    interceptedContent.push(data);
+  }
 
-  // await standardVersion({
-  //   noVerify: true,
-  //   infile: "./TESTCHANGELOG.md",
-  //   silent: false,
-  //   dryRun: false,
-  // });
+  // Start the interception
+  process.stdout.write = captureConsole;
 
+  await standardVersion({
+    noVerify: true,
+    infile: "docs/CHANGELOG.md",
+    silent: true,
+    dryRun: true,
+  });
   // // Release the interception of the console
-  // process.stdout.write = outputOrigin;
-  // for (const line of readFile.split("\n")) {
-  //   const linee = await test(line);
-  //   console.log(linee);
-  // }
-  //
+  process.stdout.write = outputOrigin;
+  for (const line of interceptedContent[0].split("\n")) {
+    const formatedLine = await checkRelease(line);
+    console.log(formatedLine);
+  }
+}
 
-  // 2) Use a local CHANGELOG.md file to test script in this repository
-  // without generating a changelog based on commit to this repository
+function useLocalChangelog() {
   var user_file = "./CHANGELOG.md";
   var r = readline.createInterface({
     input: fs.createReadStream(user_file),
   });
   r.on("line", async function (line) {
-    const linee = await test(line);
-    console.log(linee);
+    const formatedLine = await checkRelease(line);
+    console.log(formatedLine);
   });
-  //
 }
 
-async function test(text) {
+async function main() {
+  const currentUser = await getAuthUser();
+  if (currentUser["status-code"] === 401)
+    return console.log(
+      "Wrong credentials. Please verify JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variables."
+    );
+  // useStandardVersion();
+  useLocalChangelog();
+}
 
-  if (!text) {
-    return text;
+async function checkRelease(line) {
+  if (!line) {
+    return line;
   }
-  const issueId = getJiraUSFromText(text);
+  const issueId = getJiraUSFromText(line);
   if (!issueId) {
-    if (text.search(/:\*\*/) !== -1) {
-      return `[🚨 MISSING US NUMBER 🤬🫵] ${text}`;
+    if (line.search(/:\*\*/) !== -1) {
+      return `[🚨 MISSING US NUMBER 🤬🫵] ${line}`;
     }
-    return text;
+    return line;
   }
   try {
     const issue = await client.issues.getIssue({ issueIdOrKey: issueId });
@@ -112,21 +127,21 @@ async function test(text) {
     }
 
     if (!issue) {
-      return `[⁇ UNKNOWN US] ${text} `;
+      return `[⁇ UNKNOWN US] ${line} `;
     }
 
     if (
       issue.fields.status.name !== process.env.JIRA_US_READY_TO_RELEASE_STATUS
     ) {
-      return `[❌ ${issue.fields.status.name}]${subTasks} ${text} `;
+      return `[❌ ${issue.fields.status.name}]${subTasks} ${line} `;
     }
 
     return `[${subTasksReady ? "✅" : "👎"} ${
       issue.fields.status.name
-    }]${subTasks} ${text} `;
+    }]${subTasks} ${line} `;
   } catch (err) {
-    return `[🔥 ERROR DURING FETCH] ${text}`;
+    return `[🔥 ERROR DURING FETCH] ${line}`;
   }
 }
 
-analyseRelease();
+main();
