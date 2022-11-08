@@ -6,6 +6,21 @@ const dotenvExpand = require("dotenv-expand");
 const getJiraUSFromText = require("./getJiraUSFromText");
 const standardVersion = require("standard-version");
 const { GetCurrentUser } = require("jira.js/out/version2/parameters");
+const commandLineArgs = require("command-line-args");
+
+const optionDefinitions = [
+  { name: "onlyWarnings", alias: "w", type: Boolean },
+  { name: "table", alias: "t", type: Boolean },
+  { name: "disableChecks", alias: "d", type: Boolean },
+];
+
+try {
+  const options = commandLineArgs(optionDefinitions);
+  console.log(options);
+} catch {
+  console.log("Wrong options. Available options are\n--onlyWarnings (-w),\n--table (-t),\n--disableChecks (-d).");
+  return;
+}
 
 // Loads environment variables from project_path/.env file.
 dotenv.config();
@@ -133,7 +148,7 @@ async function checkRelease(line) {
       }
     }
 
-    // 
+    //
     if (!issue) {
       return `[⁇ UNKNOWN US] ${line} `;
     }
@@ -145,7 +160,9 @@ async function checkRelease(line) {
         issue.fields.status.name !== process.env.JIRA_US_RELEASE_STATUS
           ? "🚀"
           : "❌"
-      } ${issue.fields.status.name}: ${issue.key}]${subTasks}\x1b[36m${line}\x1b[0m `;
+      } ${issue.fields.status.name}: ${
+        issue.key
+      }]${subTasks}\x1b[36m${line}\x1b[0m `;
     }
 
     return `[${subTasksReady ? "✅" : "👎"} ${
