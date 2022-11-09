@@ -8,6 +8,16 @@ const standardVersion = require("standard-version");
 const { GetCurrentUser } = require("jira.js/out/version2/parameters");
 const commandLineArgs = require("command-line-args");
 
+const modeDefault = "\x1b[";
+const modeBold = "\x1b[1;";
+const modeDim = "\x1b[2;";
+const modeLink = "\x1b[2;4;3m";
+const colorReady = "32m";
+const colorNotReady = "31m";
+const colorNoAction = "36m";
+const colorDefault = "39m";
+const modeEscape = "\x1b[0m";
+
 const optionDefinitions = [
   { name: "onlyWarnings", alias: "w", type: Boolean },
   { name: "table", alias: "t", type: Boolean },
@@ -18,7 +28,9 @@ try {
   const options = commandLineArgs(optionDefinitions);
   console.log(options);
 } catch {
-  console.log("Wrong options. Available options are\n--onlyWarnings (-w),\n--table (-t),\n--disableChecks (-d).");
+  console.log(
+    "Wrong options. Available options are\n--onlyWarnings (-w),\n--table (-t),\n--disableChecks (-d)."
+  );
   return;
 }
 
@@ -92,15 +104,15 @@ async function useStandardVersion() {
   }
 }
 
-function useLocalChangelog() {
+async function useLocalChangelog() {
   var user_file = "./CHANGELOG.md";
   var r = readline.createInterface({
     input: fs.createReadStream(user_file),
   });
-  r.on("line", async function (line) {
+  for await (const line of r) {
     const formatedLine = await checkRelease(line);
     console.log(formatedLine);
-  });
+  }
 }
 
 async function main() {
@@ -112,6 +124,45 @@ async function main() {
   // useStandardVersion();
   useLocalChangelog();
 }
+
+function formatSubtasks(issue) {
+  let subTasks = "";
+  let color = colorReady;
+
+  if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
+    for (const sub of issue.fields.subtasks) {
+      const isReady =
+        sub.fields.status.name ===
+        process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
+      const isProd =
+        sub.fields.status.name === process.env.JIRA_TASK_RELEASE_STATUS;
+      if (!isReady) {
+        subTasksReady = false;
+        color = colorNotReady;
+      }
+      subTasks +=
+        modeDim +
+        `${isReady ? colorReady : isProd ? colorDefault : colorNotReady}` +
+        `(${isReady ? "✅" : isProd ? "👌" : "👎"} ${sub.fields.status.name} (${
+          sub.key
+        }))` +
+        modeEscape;
+    }
+  }
+  return subTasks;
+}
+
+// function formatUS() {
+//   if (
+//     issue.fields.status.name !== process.env.JIRA_US_READY_TO_RELEASE_STATUS
+//   ) {
+//     return `[${
+//       issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS
+//         ? "🚀"
+//         : "❌"
+//     } ${issue.fields.status.name} (${issue.key})]`;
+//   }
+// }
 
 async function checkRelease(line) {
   if (!line) {
@@ -127,47 +178,33 @@ async function checkRelease(line) {
   try {
     const issue = await client.issues.getIssue({ issueIdOrKey: issueId });
 
-    let subTasks = "";
-    let subTasksReady = true;
-    let color = "\x1b[32m";
-
-    //SUB TASK
-    if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
-      for (const sub of issue.fields.subtasks) {
-        const isReady =
-          sub.fields.status.name ===
-          process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
-        if (!isReady) {
-          subTasksReady = false;
-          color = "\x1b[31m";
-        }
-        subTasks +=
-          color +
-          `(${isReady ? "👍" : "❌"} ${sub.fields.status.name}: ${sub.key}) ` +
-          "\x1b[0m";
-      }
-    }
-
-    //
     if (!issue) {
       return `[⁇ UNKNOWN US] ${line} `;
     }
-
+    let subTasks = formatSubtasks(issue);
+    // let us = formatUS(issue);
     if (
       issue.fields.status.name !== process.env.JIRA_US_READY_TO_RELEASE_STATUS
     ) {
-      return `[${
-        issue.fields.status.name !== process.env.JIRA_US_RELEASE_STATUS
-          ? "🚀"
-          : "❌"
-      } ${issue.fields.status.name}: ${
-        issue.key
-      }]${subTasks}\x1b[36m${line}\x1b[0m `;
+      return (
+        `[${
+          issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS
+            ? "🚀"
+            : "❌"
+        } ${issue.fields.status.name} (${issue.key})]` +
+        ` ${modeBold}${colorNoAction}${issue.fields.summary}${modeEscape}` +
+        `\n${subTasks}\n` +
+        `${modeLink}${
+          "https://" +
+          process.env.JIRA_SUBDOMAIN +
+          ".atlassian.net" +
+          "/browse/" +
+          issue.key
+        }${modeEscape}`
+      );
     }
-
-    return `[${subTasksReady ? "✅" : "👎"} ${
-      issue.fields.status.name
-    }]${subTasks} ${line} `;
+    // \x1b[36m${line}\x1b[0m
+    return;
   } catch (err) {
     return `[🔥 ERROR DURING FETCH] ${line}`;
   }
