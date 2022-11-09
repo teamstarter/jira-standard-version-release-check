@@ -15,6 +15,7 @@ const modeLink = "\x1b[2;4;3m";
 const colorReady = "32m";
 const colorNotReady = "31m";
 const colorNoAction = "36m";
+const colorWarning = "33m";
 const colorDefault = "39m";
 const modeEscape = "\x1b[0m";
 
@@ -26,7 +27,7 @@ const optionDefinitions = [
 
 try {
   const options = commandLineArgs(optionDefinitions);
-  console.log(options);
+  console.log("options: ", options);
 } catch {
   console.log(
     "Wrong options. Available options are\n--onlyWarnings (-w),\n--table (-t),\n--disableChecks (-d)."
@@ -125,12 +126,13 @@ async function main() {
   useLocalChangelog();
 }
 
-function formatSubtasks(issue) {
+async function formatSubtasks(issue) {
   let subTasks = "";
   let color = colorReady;
 
   if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
-    for (const sub of issue.fields.subtasks) {
+    for await (const sub of issue.fields.subtasks) {
+      let assigneeName;
       const isReady =
         sub.fields.status.name ===
         process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
@@ -139,14 +141,28 @@ function formatSubtasks(issue) {
       if (!isReady) {
         subTasksReady = false;
         color = colorNotReady;
+        try {
+          const SubIssue = await client.issues.getIssue({
+            issueIdOrKey: sub.key,
+          });
+          assigneeName = SubIssue.fields.assignee.displayName;
+        } catch (error) {
+          assigneeName = "notfound";
+        }
       }
+
       subTasks +=
         modeDim +
         `${isReady ? colorReady : isProd ? colorDefault : colorNotReady}` +
-        `(${isReady ? "✅" : isProd ? "👌" : "👎"} ${sub.fields.status.name} (${
-          sub.key
-        }))` +
+        `(${
+          isReady
+            ? `✅ ${sub.fields.status.name}`
+            : isProd
+            ? `👌`
+            : `👎 ${sub.fields.status.name} @${assigneeName}`
+        } ${sub.key})` +
         modeEscape;
+      debugger;
     }
   }
   return subTasks;
@@ -171,42 +187,50 @@ async function checkRelease(line) {
   const issueId = getJiraUSFromText(line);
   if (!issueId) {
     if (line.search(/:\*\*/) !== -1) {
-      return `[🚨 MISSING US NUMBER 🤬🫵] ${line}`;
+      return `${modeBold}${colorWarning}[🚨 No US number]${modeEscape} ${line}\n`;
     }
     return line;
   }
   try {
     const issue = await client.issues.getIssue({ issueIdOrKey: issueId });
-
     if (!issue) {
-      return `[⁇ UNKNOWN US] ${line} `;
+      return `${modeBold}${colorWarning}[US not found]${modeEscape} ${line} `;
     }
-    let subTasks = formatSubtasks(issue);
-    // let us = formatUS(issue);
-    if (
-      issue.fields.status.name !== process.env.JIRA_US_READY_TO_RELEASE_STATUS
-    ) {
-      return (
-        `[${
-          issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS
-            ? "🚀"
-            : "❌"
-        } ${issue.fields.status.name} (${issue.key})]` +
-        ` ${modeBold}${colorNoAction}${issue.fields.summary}${modeEscape}` +
-        `\n${subTasks}\n` +
-        `${modeLink}${
-          "https://" +
-          process.env.JIRA_SUBDOMAIN +
-          ".atlassian.net" +
-          "/browse/" +
-          issue.key
-        }${modeEscape}`
-      );
-    }
-    // \x1b[36m${line}\x1b[0m
-    return;
+    let subTasks = await formatSubtasks(issue);
+    const isUsInProd =
+      issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS;
+    const isUsReady =
+      issue.fields.status.name === process.env.JIRA_US_READY_TO_RELEASE_STATUS;
+    return (
+      `${modeBold}${
+        isUsInProd
+          ? `${colorNoAction}[🚀`
+          : isUsReady
+          ? `${colorReady}[✅ `
+          : `${colorNotReady}[❌ `
+      }` +
+      `${isUsInProd ? "" : issue.fields.status.name}` +
+      `]` +
+      ` (${issue.key})` +
+      `${
+        isUsReady
+          ? ``
+          : isUsInProd
+          ? ``
+          : ` @` + issue.fields.creator.displayName
+      }` +
+      ` ${issue.fields.summary}${modeEscape}` +
+      `\n${subTasks}\n` +
+      `${modeLink}${
+        "https://" +
+        process.env.JIRA_SUBDOMAIN +
+        ".atlassian.net" +
+        "/browse/" +
+        issue.key
+      }${modeEscape}\n`
+    );
   } catch (err) {
-    return `[🔥 ERROR DURING FETCH] ${line}`;
+    return `${modeBold}${colorWarning}[🔥 ERROR DURING FETCH]${modeEscape} ${line}\n`;
   }
 }
 
