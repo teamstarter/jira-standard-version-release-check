@@ -126,59 +126,109 @@ async function main() {
   useLocalChangelog();
 }
 
-async function formatSubtasks(issue) {
-  let subTasks = "";
-  let color = colorReady;
-
-  if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
-    for await (const sub of issue.fields.subtasks) {
-      let assigneeName;
-      const isReady =
-        sub.fields.status.name ===
-        process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
-      const isProd =
-        sub.fields.status.name === process.env.JIRA_TASK_RELEASE_STATUS;
-      if (!isReady) {
-        subTasksReady = false;
-        color = colorNotReady;
-        try {
-          const SubIssue = await client.issues.getIssue({
-            issueIdOrKey: sub.key,
-          });
-          assigneeName = SubIssue.fields.assignee.displayName;
-        } catch (error) {
-          assigneeName = "notfound";
-        }
-      }
-
-      subTasks +=
-        modeDim +
-        `${isReady ? colorReady : isProd ? colorDefault : colorNotReady}` +
-        `(${
-          isReady
-            ? `✅ ${sub.fields.status.name}`
-            : isProd
-            ? `👌`
-            : `👎 ${sub.fields.status.name} @${assigneeName}`
-        } ${sub.key})` +
-        modeEscape;
-      debugger;
+async function formatSingleSubtask(sub) {
+  let assigneeName;
+  const isReady =
+    sub.fields.status.name === process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
+  const isProd =
+    sub.fields.status.name === process.env.JIRA_TASK_RELEASE_STATUS;
+  if (!isReady) {
+    subTasksReady = false;
+    color = colorNotReady;
+    try {
+      const SubIssue = await client.issues.getIssue({
+        issueIdOrKey: sub.key,
+      });
+      assigneeName = SubIssue.fields.assignee.displayName;
+    } catch (error) {
+      assigneeName = "no-assignee";
     }
   }
-  return subTasks;
+  return (
+    modeDim +
+    `${isReady ? colorReady : isProd ? colorDefault : colorNotReady}` +
+    `(${
+      isReady
+        ? `✅ ${sub.fields.status.name}`
+        : isProd
+        ? `👌`
+        : `👎 ${sub.fields.status.name} @${assigneeName}`
+    } ${sub.key})` +
+    modeEscape
+  );
 }
 
-// function formatUS() {
-//   if (
-//     issue.fields.status.name !== process.env.JIRA_US_READY_TO_RELEASE_STATUS
-//   ) {
-//     return `[${
-//       issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS
-//         ? "🚀"
-//         : "❌"
-//     } ${issue.fields.status.name} (${issue.key})]`;
-//   }
-// }
+async function formatSubtasks(issue) {
+  let subTasks = "\n";
+  let color = colorReady;
+
+  for await (const sub of issue.fields.subtasks) {
+    subTasks += await formatSingleSubtask(sub);
+  }
+  return subTasks + `\n`;
+}
+
+function formatUS(issue) {
+  const isUsInProd =
+    issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS;
+  const isUsReady =
+    issue.fields.status.name === process.env.JIRA_US_READY_TO_RELEASE_STATUS;
+  return (
+    `${modeBold}${
+      isUsInProd
+        ? `${colorNoAction}[🚀`
+        : isUsReady
+        ? `${colorReady}[✅ `
+        : `${colorNotReady}[❌ `
+    }` +
+    `${isUsInProd ? "" : issue.fields.status.name}` +
+    `]` +
+    ` (${issue.key})` +
+    `${
+      isUsReady ? `` : isUsInProd ? `` : ` @` + issue.fields.creator.displayName
+    }` +
+    ` ${issue.fields.summary}${modeEscape}`
+  );
+}
+
+function formatLink(key) {
+  return `${modeLink}${
+    "https://" +
+    process.env.JIRA_SUBDOMAIN +
+    ".atlassian.net" +
+    "/browse/" +
+    key
+  }${modeEscape}\n`;
+}
+
+async function issueIsUS(issue) {
+  let subTasks = await formatSubtasks(issue);
+  return formatUS(issue) + subTasks + formatLink(issue.key);
+}
+
+async function issueIsSub(issue) {
+  try {
+    const parentIssue = await client.issues.getIssue({
+      issueIdOrKey: issue.fields.parent.key,
+    });
+    return (
+      `${modeBold}${colorWarning}[👮‍ ` +
+      issue.key +
+      ` is a TASK] amend commit for => ${modeEscape}` +
+      formatUS(parentIssue) +
+      `\n` +
+      (await formatSingleSubtask(issue)) +
+      `\n` +
+      formatLink(parentIssue.key)
+    );
+  } catch (error) {
+    return (
+      `${modeBold}${colorWarning}[TASK ` +
+      issue.key +
+      ` has no US]${modeEscape}`
+    );
+  }
+}
 
 async function checkRelease(line) {
   if (!line) {
@@ -191,46 +241,19 @@ async function checkRelease(line) {
     }
     return line;
   }
+  let issue;
   try {
-    const issue = await client.issues.getIssue({ issueIdOrKey: issueId });
-    if (!issue) {
-      return `${modeBold}${colorWarning}[US not found]${modeEscape} ${line} `;
-    }
-    let subTasks = await formatSubtasks(issue);
-    const isUsInProd =
-      issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS;
-    const isUsReady =
-      issue.fields.status.name === process.env.JIRA_US_READY_TO_RELEASE_STATUS;
-    return (
-      `${modeBold}${
-        isUsInProd
-          ? `${colorNoAction}[🚀`
-          : isUsReady
-          ? `${colorReady}[✅ `
-          : `${colorNotReady}[❌ `
-      }` +
-      `${isUsInProd ? "" : issue.fields.status.name}` +
-      `]` +
-      ` (${issue.key})` +
-      `${
-        isUsReady
-          ? ``
-          : isUsInProd
-          ? ``
-          : ` @` + issue.fields.creator.displayName
-      }` +
-      ` ${issue.fields.summary}${modeEscape}` +
-      `\n${subTasks}\n` +
-      `${modeLink}${
-        "https://" +
-        process.env.JIRA_SUBDOMAIN +
-        ".atlassian.net" +
-        "/browse/" +
-        issue.key
-      }${modeEscape}\n`
-    );
+    issue = await client.issues.getIssue({ issueIdOrKey: issueId });
   } catch (err) {
     return `${modeBold}${colorWarning}[🔥 ERROR DURING FETCH]${modeEscape} ${line}\n`;
+  }
+  if (!issue) {
+    return `${modeBold}${colorWarning}[US not found]${modeEscape} ${line} `;
+  }
+  if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
+    return await issueIsUS(issue);
+  } else if (issue.fields.subtasks.length <= 0) {
+    return await issueIsSub(issue);
   }
 }
 
