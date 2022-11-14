@@ -122,8 +122,8 @@ async function main() {
     return console.log(
       "Wrong credentials. Please verify JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variables."
     );
-  // useStandardVersion();
-  useLocalChangelog();
+  useStandardVersion();
+  // useLocalChangelog();
 }
 
 async function formatSingleSubtask(sub) {
