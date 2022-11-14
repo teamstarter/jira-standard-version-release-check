@@ -1,12 +1,14 @@
-const fs = require("fs");
-const readline = require("readline");
-const { Version3Client } = require("jira.js");
-const dotenv = require("dotenv");
-const dotenvExpand = require("dotenv-expand");
-const getJiraUSFromText = require("./getJiraUSFromText");
-const standardVersion = require("standard-version");
-const { GetCurrentUser } = require("jira.js/out/version2/parameters");
-const commandLineArgs = require("command-line-args");
+import fs from "fs";
+import readline from "readline";
+import { Version3Client } from "jira.js";
+import dotenv from "dotenv";
+import dotenvExpand from "dotenv-expand";
+
+import standardVersion from "standard-version";
+import { GetCurrentUser } from "jira.js/out/version2/parameters";
+import commandLineArgs from "ts-command-line-args";
+import { parse } from "ts-command-line-args";
+import { getJiraUSFromText } from "./getJiraUSFromText";
 
 const modeDefault = "\x1b[";
 const modeBold = "\x1b[1;";
@@ -19,57 +21,72 @@ const colorWarning = "33m";
 const colorDefault = "39m";
 const modeEscape = "\x1b[0m";
 
-const optionDefinitions = [
-  { name: "onlyWarnings", alias: "w", type: Boolean },
-  { name: "table", alias: "t", type: Boolean },
-  { name: "disableChecks", alias: "d", type: Boolean },
-];
-
-let options = [];
-try {
-  options = commandLineArgs(optionDefinitions);
-} catch {
-  console.log(
-    "Wrong options. Available options are\n--onlyWarnings (-w),\n--table (-t),\n--disableChecks (-d)."
-  );
-  return;
+interface IOptionsArguments {
+  onlyWarnings: boolean;
+  table: boolean;
+  disableChecks: boolean;
 }
 
-// Loads environment variables from project_path/.env file.
-dotenv.config();
+let options: IOptionsArguments;
+let consoleOutputArray = [];
 
-// When run for the unit/func tests, we do not expand the .env as it will lose
-// the unset of variable from the command line. (SENDGRID_API_KEY=)
-if (process.env.NODE_ENV !== "test") {
-  const myEnv = dotenv.config();
-  dotenvExpand.expand(myEnv);
-}
+let client: Version3Client;
 
-if (!process.env.JIRA_ACCOUNT_EMAIL || !process.env.JIRA_ACCOUNT_TOKEN) {
-  return console.error(
-    "You need to provide a JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variable. Put your work email and a token generated at this url: https://id.atlassian.com/manage-profile/security/api-tokens."
-  );
-}
+const setOptions = () => {
+  try {
+    options = parse<IOptionsArguments>({
+      onlyWarnings: { type: Boolean, alias: "w" },
+      table: { type: Boolean, alias: "t" },
+      disableChecks: { type: Boolean, alias: "c" },
+    });
+  } catch {
+    console.error(
+      "Wrong options. Available options are\n--onlyWarnings (-w),\n--table (-t),\n--disableChecks (-d)."
+    );
+    return false;
+  }
+  return true;
+};
 
-if (
-  !process.env.JIRA_US_READY_TO_RELEASE_STATUS ||
-  !process.env.JIRA_TASK_READY_TO_RELEASE_STATUS
-) {
-  return console.error(
-    "You need to provide a JIRA_US_READY_TO_RELEASE_STATUS and JIRA_TASK_READY_TO_RELEASE_STATUS env variable. They must contain the status name of the User Story and the status name of Tasks you expect for any feature to check when releasing."
-  );
-}
+const getEnvVariables = () => {
+  // Loads environment variables from project_path/.env file.
+  dotenv.config();
 
-const client = new Version3Client({
-  host: "https://teamstarter.atlassian.net",
-  authentication: {
-    basic: {
-      email: process.env.JIRA_ACCOUNT_EMAIL,
-      apiToken: process.env.JIRA_ACCOUNT_TOKEN,
+  // When run for the unit/func tests, we do not expand the .env as it will lose
+  // the unset of variable from the command line. (SENDGRID_API_KEY=)
+  if (process.env.NODE_ENV !== "test") {
+    const myEnv = dotenv.config();
+    dotenvExpand.expand(myEnv);
+  }
+
+  if (!process.env.JIRA_ACCOUNT_EMAIL || !process.env.JIRA_ACCOUNT_TOKEN) {
+    console.error(
+      "You need to provide a JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variable. Put your work email and a token generated at this url: https://id.atlassian.com/manage-profile/security/api-tokens."
+    );
+    return false;
+  }
+
+  if (
+    !process.env.JIRA_US_READY_TO_RELEASE_STATUS ||
+    !process.env.JIRA_TASK_READY_TO_RELEASE_STATUS
+  ) {
+    console.error(
+      "You need to provide a JIRA_US_READY_TO_RELEASE_STATUS and JIRA_TASK_READY_TO_RELEASE_STATUS env variable. They must contain the status name of the User Story and the status name of Tasks you expect for any feature to check when releasing."
+    );
+    return false;
+  }
+  client = new Version3Client({
+    host: "https://teamstarter.atlassian.net",
+    authentication: {
+      basic: {
+        email: process.env.JIRA_ACCOUNT_EMAIL,
+        apiToken: process.env.JIRA_ACCOUNT_TOKEN,
+      },
     },
-  },
-  newErrorHandling: true,
-});
+    newErrorHandling: true,
+  });
+  return true;
+};
 
 async function getAuthUser() {
   try {
@@ -82,10 +99,11 @@ async function getAuthUser() {
 async function useStandardVersion() {
   // standard version do not provide a way to get the output
   // So we intercept it!
-  const interceptedContent = [];
+  const interceptedContent: String[] = [];
   const outputOrigin = process.stdout.write;
-  function captureConsole(data) {
+  function captureConsole(data: string) {
     interceptedContent.push(data);
+    return true;
   }
 
   // Start the interception
@@ -117,8 +135,13 @@ async function useLocalChangelog() {
 }
 
 async function main() {
+  if (!setOptions || !getEnvVariables) return;
   const currentUser = await getAuthUser();
-  if (currentUser["status-code"] === 401)
+  debugger;
+  if (
+    currentUser &&
+    currentUser["status-code" as keyof typeof currentUser] === 401
+  )
     return console.log(
       "Wrong credentials. Please verify JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variables."
     );
@@ -126,15 +149,13 @@ async function main() {
   // useLocalChangelog();
 }
 
-async function formatSingleSubtask(sub) {
+async function formatSingleSubtask(sub: any) {
   let assigneeName;
   const isReady =
     sub.fields.status.name === process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
   const isProd =
     sub.fields.status.name === process.env.JIRA_TASK_RELEASE_STATUS;
   if (!isReady) {
-    subTasksReady = false;
-    color = colorNotReady;
     try {
       const SubIssue = await client.issues.getIssue({
         issueIdOrKey: sub.key,
@@ -161,9 +182,8 @@ async function formatSingleSubtask(sub) {
   } ${sub.key})${modeEscape}`;
 }
 
-async function formatSubtasks(issue) {
+async function formatSubtasks(issue: any) {
   let subTasks = "";
-  let color = colorReady;
 
   for await (const sub of issue.fields.subtasks) {
     subTasks += await formatSingleSubtask(sub);
@@ -172,7 +192,7 @@ async function formatSubtasks(issue) {
   return "";
 }
 
-function formatUS(issue) {
+function formatUS(issue: any) {
   const isUsInProd =
     issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS;
   const isUsReady =
@@ -199,7 +219,7 @@ function formatLink(key) {
   return `${modeLink}https://${process.env.JIRA_SUBDOMAIN}.atlassian.net/browse/${key}${modeEscape}\n`;
 }
 
-async function issueIsUS(issue) {
+async function issueIsUS(issue: any) {
   const usFormatted = formatUS(issue);
   let subFormatted = "";
   if (usFormatted !== "") subFormatted = await formatSubtasks(issue);
@@ -210,7 +230,7 @@ async function issueIsUS(issue) {
   return result;
 }
 
-async function issueIsSub(issue) {
+async function issueIsSub(issue: any) {
   try {
     const parentIssue = await client.issues.getIssue({
       issueIdOrKey: issue.fields.parent.key,
@@ -233,7 +253,7 @@ async function issueIsSub(issue) {
   }
 }
 
-async function checkRelease(line) {
+async function checkRelease(line: any) {
   if (!line) {
     return line;
   }
@@ -245,8 +265,10 @@ async function checkRelease(line) {
     return line;
   }
   let issue;
+  debugger;
   try {
     issue = await client.issues.getIssue({ issueIdOrKey: issueId });
+    debugger;
   } catch (err) {
     return `${modeBold}${colorWarning}[🔥 ERROR DURING FETCH]${modeEscape} ${line}\n`;
   }
