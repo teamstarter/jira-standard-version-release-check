@@ -15,8 +15,7 @@ export function formatUS(issue: Issue) {
 
   if (options && options.onlyWarnings) {
     if (!isUsReady && !isUsInProd)
-      return `${formated.modeBold}${formated.colorNotReady}[❌ ${issue.fields.status.name}](${issue.key}) \
-      @${issue.fields.creator.displayName} ${issue.fields.summary}${formated.modeEscape}`;
+      return `${formated.modeBold}${formated.colorNotReady}[❌ ${issue.fields.status.name}](${issue.key}) @${issue.fields.creator.displayName} ${issue.fields.summary}${formated.modeEscape}`;
     return "";
   }
   return `${formated.modeBold}${
@@ -26,7 +25,7 @@ export function formatUS(issue: Issue) {
       ? `${formated.colorReady}[✅ `
       : `${formated.colorNotReady}[❌ `
   }${isUsInProd ? "" : issue.fields.status.name}] (${issue.key})${
-    isUsReady ? `` : isUsInProd ? `` : ` @ ${issue.fields.creator.displayName}`
+    isUsReady ? `` : isUsInProd ? `` : ` @${issue.fields.creator.displayName}`
   } ${issue.fields.summary}${formated.modeEscape}`;
 }
 
@@ -52,8 +51,7 @@ export async function formatSingleSubtask(sub: Issue) {
   }
   if (options && options.onlyWarnings) {
     if (!isReady && !isProd)
-      return `${formated.modeDim}${formated.colorNotReady}(👎 ${sub.fields.status.name} \
-        @${assigneeName} ${sub.key})${formated.modeEscape}`;
+      return `${formated.modeDim}${formated.colorNotReady}(👎 ${sub.fields.status.name} @${assigneeName} ${sub.key})${formated.modeEscape}`;
     return "";
   }
   return `${formated.modeDim}${

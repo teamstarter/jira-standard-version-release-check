@@ -32,15 +32,15 @@ async function issueIsSub(issue: Issue) {
     const parentFormatted = formatUS(parentIssue);
     return `${formated.modeBold}${formated.colorWarning}[👮‍ ${
       issue.key
-    } is a TASK]${formated.modeEscape} ${parentFormatted}\
-    ${subFormatted === "" ? "" : `\n${subFormatted}\n`} \
-      ${
-        parentFormatted === ""
-          ? parentFormatted === "" && subFormatted === ""
-            ? "\n"
-            : formatLink(parentIssue.key)
-          : ""
-      }`;
+    } is a TASK]${formated.modeEscape} ${parentFormatted}${
+      subFormatted === "" ? "" : `\n${subFormatted}\n`
+    } ${
+      parentFormatted === ""
+        ? parentFormatted === "" && subFormatted === ""
+          ? "\n"
+          : formatLink(parentIssue.key)
+        : ""
+    }`;
   } catch (error) {
     return `${formated.modeBold}${formated.colorWarning}[TASK ${issue.key} has no US]${formated.modeEscape}`;
   }
