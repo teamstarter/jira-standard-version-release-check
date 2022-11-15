@@ -1,5 +1,5 @@
 import { parse } from "ts-command-line-args";
-import { IOptionsArguments } from "./interfaces/interfaces";
+import { IOptionsArguments } from "./globals/interfaces";
 
 export const SOptions = (function () {
   let options: IOptionsArguments;

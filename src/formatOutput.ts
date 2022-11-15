@@ -1,7 +1,7 @@
 import { Version3Client } from "jira.js";
 import { Issue } from "jira.js/out/version3/models/issue";
-import { formated } from "./globals";
-import { IOptionsArguments } from "./interfaces/interfaces";
+import { formated } from "./globals/globals";
+import { IOptionsArguments } from "./globals/interfaces";
 import { SClient } from "./setUpJiraClient";
 import { SOptions } from "./setUpOptions";
 

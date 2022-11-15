@@ -6,7 +6,7 @@ import {
   formatSingleSubtask,
 } from "./formatOutput";
 import { getJiraUSFromText } from "./getJiraUSFromText";
-import { formated } from "./globals";
+import { formated } from "./globals/globals";
 import { SClient } from "./setUpJiraClient";
 
 async function issueIsUS(issue: Issue) {
