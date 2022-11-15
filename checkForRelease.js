@@ -146,25 +146,19 @@ async function formatSingleSubtask(sub) {
   }
   if (options && options.onlyWarnings) {
     if (!isReady && !isProd)
-      return (
-        modeDim +
-        `${colorNotReady}(👎 ${sub.fields.status.name} @${assigneeName} ${sub.key})` +
-        modeEscape
-      );
-    else return "";
+      return `${modeDim}${colorNotReady}(👎 ${sub.fields.status.name} \
+        @${assigneeName} ${sub.key})${modeEscape}`;
+    return "";
   }
-  return (
-    modeDim +
-    `${isReady ? colorReady : isProd ? colorDefault : colorNotReady}` +
-    `(${
-      isReady
-        ? `✅ ${sub.fields.status.name}`
-        : isProd
-        ? `👌`
-        : `👎 ${sub.fields.status.name} @${assigneeName}`
-    } ${sub.key})` +
-    modeEscape
-  );
+  return `${modeDim}${
+    isReady ? colorReady : isProd ? colorDefault : colorNotReady
+  }(${
+    isReady
+      ? `✅ ${sub.fields.status.name}`
+      : isProd
+      ? `👌`
+      : `👎 ${sub.fields.status.name} @${assigneeName}`
+  } ${sub.key})${modeEscape}`;
 }
 
 async function formatSubtasks(issue) {
@@ -175,7 +169,7 @@ async function formatSubtasks(issue) {
     subTasks += await formatSingleSubtask(sub);
   }
   if (subTasks !== "") return `\n` + subTasks + `\n`;
-  else return "";
+  return "";
 }
 
 function formatUS(issue) {
@@ -186,40 +180,23 @@ function formatUS(issue) {
 
   if (options && options.onlyWarnings) {
     if (!isUsReady && !isUsInProd)
-      return (
-        `${modeBold}${colorNotReady}[❌ ${issue.fields.status.name}]` +
-        ` (${issue.key}) @` +
-        issue.fields.creator.displayName +
-        ` ${issue.fields.summary}${modeEscape}`
-      );
-    else return "";
+      return `${modeBold}${colorNotReady}[❌ ${issue.fields.status.name}](${issue.key}) \
+      @${issue.fields.creator.displayName} ${issue.fields.summary}${modeEscape}`;
+    return "";
   }
-  return (
-    `${modeBold}${
-      isUsInProd
-        ? `${colorNoAction}[🚀`
-        : isUsReady
-        ? `${colorReady}[✅ `
-        : `${colorNotReady}[❌ `
-    }` +
-    `${isUsInProd ? "" : issue.fields.status.name}` +
-    `]` +
-    ` (${issue.key})` +
-    `${
-      isUsReady ? `` : isUsInProd ? `` : ` @` + issue.fields.creator.displayName
-    }` +
-    ` ${issue.fields.summary}${modeEscape}`
-  );
+  return `${modeBold}${
+    isUsInProd
+      ? `${colorNoAction}[🚀`
+      : isUsReady
+      ? `${colorReady}[✅ `
+      : `${colorNotReady}[❌ `
+  }${isUsInProd ? "" : issue.fields.status.name}] (${issue.key})${
+    isUsReady ? `` : isUsInProd ? `` : ` @ ${issue.fields.creator.displayName}`
+  } ${issue.fields.summary}${modeEscape}`;
 }
 
 function formatLink(key) {
-  return `${modeLink}${
-    "https://" +
-    process.env.JIRA_SUBDOMAIN +
-    ".atlassian.net" +
-    "/browse/" +
-    key
-  }${modeEscape}\n`;
+  return `${modeLink}https://${process.env.JIRA_SUBDOMAIN}.atlassian.net/browse/${key}${modeEscape}\n`;
 }
 
 async function issueIsUS(issue) {
@@ -230,7 +207,6 @@ async function issueIsUS(issue) {
     usFormatted +
     subFormatted +
     `${usFormatted === "" ? "" : formatLink(issue.key)}`;
-  debugger;
   return result;
 }
 
@@ -241,26 +217,19 @@ async function issueIsSub(issue) {
     });
     const subFormatted = await formatSingleSubtask(issue);
     const parentFormatted = await formatUS(parentIssue);
-    return (
-      `${modeBold}${colorWarning}[👮‍ ` +
-      issue.key +
-      ` is a TASK] ${modeEscape}` +
-      parentFormatted +
-      `${subFormatted === "" ? "" : `\n${subFormatted}\n`}` +
-      `${
+    return `${modeBold}${colorWarning}[👮‍ ${
+      issue.key
+    } is a TASK]${modeEscape} ${parentFormatted}\
+    ${subFormatted === "" ? "" : `\n${subFormatted}\n`} \
+      ${
         parentFormatted === ""
           ? parentFormatted === "" && subFormatted === ""
             ? "\n"
             : formatLink(parentIssue.key)
           : ""
-      }`
-    );
+      }`;
   } catch (error) {
-    return (
-      `${modeBold}${colorWarning}[TASK ` +
-      issue.key +
-      ` has no US]${modeEscape}`
-    );
+    return `${modeBold}${colorWarning}[TASK ${issue.key} has no US]${modeEscape}`;
   }
 }
 
@@ -286,9 +255,8 @@ async function checkRelease(line) {
   }
   if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
     return await issueIsUS(issue);
-  } else if (issue.fields.subtasks.length <= 0) {
-    return await issueIsSub(issue);
   }
+  return await issueIsSub(issue);
 }
 
 main();
