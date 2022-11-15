@@ -1,6 +1,6 @@
 import { Version3Client } from "jira.js";
 import { Issue } from "jira.js/out/version3/models/issue";
-import { formated } from "./globals/globals";
+import { _gASCII } from "./globals/globals";
 import { IOptionsArguments } from "./globals/interfaces";
 import { SClient } from "./setUpJiraClient";
 import { SOptions } from "./setUpOptions";
@@ -15,18 +15,18 @@ export function formatUS(issue: Issue) {
 
   if (options && options.onlyWarnings) {
     if (!isUsReady && !isUsInProd)
-      return `${formated.modeBold}${formated.colorNotReady}[❌ ${issue.fields.status.name}](${issue.key}) @${issue.fields.creator.displayName} ${issue.fields.summary}${formated.modeEscape}`;
+      return `${_gASCII.modeBold}${_gASCII.colorNotReady}[❌ ${issue.fields.status.name}](${issue.key}) @${issue.fields.creator.displayName} ${issue.fields.summary}${_gASCII.modeEscape}`;
     return "";
   }
-  return `${formated.modeBold}${
+  return `${_gASCII.modeBold}${
     isUsInProd
-      ? `${formated.colorNoAction}[🚀`
+      ? `${_gASCII.colorNoAction}[🚀`
       : isUsReady
-      ? `${formated.colorReady}[✅ `
-      : `${formated.colorNotReady}[❌ `
+      ? `${_gASCII.colorReady}[✅ `
+      : `${_gASCII.colorNotReady}[❌ `
   }${isUsInProd ? "" : issue.fields.status.name}] (${issue.key})${
     isUsReady ? `` : isUsInProd ? `` : ` @${issue.fields.creator.displayName}`
-  } ${issue.fields.summary}${formated.modeEscape}`;
+  } ${issue.fields.summary}${_gASCII.modeEscape}`;
 }
 
 export async function formatSingleSubtask(sub: Issue) {
@@ -51,22 +51,22 @@ export async function formatSingleSubtask(sub: Issue) {
   }
   if (options && options.onlyWarnings) {
     if (!isReady && !isProd)
-      return `${formated.modeDim}${formated.colorNotReady}(👎 ${sub.fields.status.name} @${assigneeName} ${sub.key})${formated.modeEscape}`;
+      return `${_gASCII.modeDim}${_gASCII.colorNotReady}(👎 ${sub.fields.status.name} @${assigneeName} ${sub.key})${_gASCII.modeEscape}`;
     return "";
   }
-  return `${formated.modeDim}${
+  return `${_gASCII.modeDim}${
     isReady
-      ? formated.colorReady
+      ? _gASCII.colorReady
       : isProd
-      ? formated.colorDefault
-      : formated.colorNotReady
+      ? _gASCII.colorDefault
+      : _gASCII.colorNotReady
   }(${
     isReady
       ? `✅ ${sub.fields.status.name}`
       : isProd
       ? `👌`
       : `👎 ${sub.fields.status.name} @${assigneeName}`
-  } ${sub.key})${formated.modeEscape}`;
+  } ${sub.key})${_gASCII.modeEscape}`;
 }
 
 export async function formatSubtasks(issue: Issue) {
@@ -80,5 +80,5 @@ export async function formatSubtasks(issue: Issue) {
 }
 
 export function formatLink(key: string) {
-  return `${formated.modeLink}https://${process.env.JIRA_SUBDOMAIN}.atlassian.net/browse/${key}${formated.modeEscape}\n`;
+  return `${_gASCII.modeLink}https://${process.env.JIRA_SUBDOMAIN}.atlassian.net/browse/${key}${_gASCII.modeEscape}\n`;
 }

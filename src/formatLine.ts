@@ -6,7 +6,7 @@ import {
   formatSingleSubtask,
 } from "./formatOutput";
 import { getJiraUSFromText } from "./getJiraUSFromText";
-import { formated } from "./globals/globals";
+import { _gASCII } from "./globals/globals";
 import { SClient } from "./setUpJiraClient";
 
 async function issueIsUS(issue: Issue) {
@@ -30,9 +30,9 @@ async function issueIsSub(issue: Issue) {
     });
     const subFormatted = await formatSingleSubtask(issue);
     const parentFormatted = formatUS(parentIssue);
-    return `${formated.modeBold}${formated.colorWarning}[👮‍ ${
+    return `${_gASCII.modeBold}${_gASCII.colorWarning}[👮‍ ${
       issue.key
-    } is a TASK]${formated.modeEscape} ${parentFormatted}${
+    } is a TASK]${_gASCII.modeEscape} ${parentFormatted}${
       subFormatted === "" ? "" : `\n${subFormatted}\n`
     } ${
       parentFormatted === ""
@@ -42,7 +42,7 @@ async function issueIsSub(issue: Issue) {
         : ""
     }`;
   } catch (error) {
-    return `${formated.modeBold}${formated.colorWarning}[TASK ${issue.key} has no US]${formated.modeEscape}`;
+    return `${_gASCII.modeBold}${_gASCII.colorWarning}[TASK ${issue.key} has no US]${_gASCII.modeEscape}`;
   }
 }
 
@@ -55,7 +55,7 @@ export async function formatLine(line: string) {
   const issueId = getJiraUSFromText(line);
   if (!issueId) {
     if (line.search(/:\*\*/) !== -1) {
-      return `${formated.modeBold}${formated.colorWarning}[🚨 No US number]${formated.modeEscape} ${line}\n`;
+      return `${_gASCII.modeBold}${_gASCII.colorWarning}[🚨 No US number]${_gASCII.modeEscape} ${line}\n`;
     }
     return line;
   }
@@ -63,10 +63,10 @@ export async function formatLine(line: string) {
   try {
     issue = await client.issues.getIssue({ issueIdOrKey: issueId });
   } catch (err) {
-    return `${formated.modeBold}${formated.colorWarning}[🔥 ERROR DURING FETCH]${formated.modeEscape} ${line}\n`;
+    return `${_gASCII.modeBold}${_gASCII.colorWarning}[🔥 ERROR DURING FETCH]${_gASCII.modeEscape} ${line}\n`;
   }
   if (!issue) {
-    return `${formated.modeBold}${formated.colorWarning}[US not found]${formated.modeEscape} ${line} `;
+    return `${_gASCII.modeBold}${_gASCII.colorWarning}[US not found]${_gASCII.modeEscape} ${line} `;
   }
   if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
     return await issueIsUS(issue);

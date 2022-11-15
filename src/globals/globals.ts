@@ -1,4 +1,4 @@
-export const formated = {
+export const _gASCII = {
   modeDefault: "\x1b[",
   modeBold: "\x1b[1;",
   modeDim: "\x1b[2;",
@@ -10,3 +10,5 @@ export const formated = {
   colorDefault: "39m",
   modeEscape: "\x1b[0m",
 };
+
+export let _gConsoleOutputArray = [];
