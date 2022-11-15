@@ -15,30 +15,19 @@ export function formatUS(issue: Issue) {
 
   if (options && options.onlyWarnings) {
     if (!isUsReady && !isUsInProd)
-      return (
-        `${formated.modeBold}${formated.colorNotReady}[❌ ${issue.fields.status.name}]` +
-        ` (${issue.key}) @` +
-        issue.fields.creator.displayName +
-        ` ${issue.fields.summary}${formated.modeEscape}`
-      );
-    else return "";
+      return `${formated.modeBold}${formated.colorNotReady}[❌ ${issue.fields.status.name}](${issue.key}) \
+      @${issue.fields.creator.displayName} ${issue.fields.summary}${formated.modeEscape}`;
+    return "";
   }
-  return (
-    `${formated.modeBold}${
-      isUsInProd
-        ? `${formated.colorNoAction}[🚀`
-        : isUsReady
-        ? `${formated.colorReady}[✅ `
-        : `${formated.colorNotReady}[❌ `
-    }` +
-    `${isUsInProd ? "" : issue.fields.status.name}` +
-    `]` +
-    ` (${issue.key})` +
-    `${
-      isUsReady ? `` : isUsInProd ? `` : ` @` + issue.fields.creator.displayName
-    }` +
-    ` ${issue.fields.summary}${formated.modeEscape}`
-  );
+  return `${formated.modeBold}${
+    isUsInProd
+      ? `${formated.colorNoAction}[🚀`
+      : isUsReady
+      ? `${formated.colorReady}[✅ `
+      : `${formated.colorNotReady}[❌ `
+  }${isUsInProd ? "" : issue.fields.status.name}] (${issue.key})${
+    isUsReady ? `` : isUsInProd ? `` : ` @ ${issue.fields.creator.displayName}`
+  } ${issue.fields.summary}${formated.modeEscape}`;
 }
 
 export async function formatSingleSubtask(sub: Issue) {
@@ -63,31 +52,23 @@ export async function formatSingleSubtask(sub: Issue) {
   }
   if (options && options.onlyWarnings) {
     if (!isReady && !isProd)
-      return (
-        formated.modeDim +
-        `${formated.colorNotReady}(👎 ${sub.fields.status.name} @${assigneeName} ${sub.key})` +
-        formated.modeEscape
-      );
-    else return "";
+      return `${formated.modeDim}${formated.colorNotReady}(👎 ${sub.fields.status.name} \
+        @${assigneeName} ${sub.key})${formated.modeEscape}`;
+    return "";
   }
-  return (
-    formated.modeDim +
-    `${
-      isReady
-        ? formated.colorReady
-        : isProd
-        ? formated.colorDefault
-        : formated.colorNotReady
-    }` +
-    `(${
-      isReady
-        ? `✅ ${sub.fields.status.name}`
-        : isProd
-        ? `👌`
-        : `👎 ${sub.fields.status.name} @${assigneeName}`
-    } ${sub.key})` +
-    formated.modeEscape
-  );
+  return `${formated.modeDim}${
+    isReady
+      ? formated.colorReady
+      : isProd
+      ? formated.colorDefault
+      : formated.colorNotReady
+  }(${
+    isReady
+      ? `✅ ${sub.fields.status.name}`
+      : isProd
+      ? `👌`
+      : `👎 ${sub.fields.status.name} @${assigneeName}`
+  } ${sub.key})${formated.modeEscape}`;
 }
 
 export async function formatSubtasks(issue: Issue) {
@@ -96,16 +77,10 @@ export async function formatSubtasks(issue: Issue) {
   for await (const sub of issue.fields.subtasks) {
     subTasks += await formatSingleSubtask(sub);
   }
-  if (subTasks !== "") return `\n` + subTasks + `\n`;
-  else return "";
+  if (subTasks !== "") return `\n${subTasks}\n`;
+  return "";
 }
 
 export function formatLink(key: string) {
-  return `${formated.modeLink}${
-    "https://" +
-    process.env.JIRA_SUBDOMAIN +
-    ".atlassian.net" +
-    "/browse/" +
-    key
-  }${formated.modeEscape}\n`;
+  return `${formated.modeLink}https://${process.env.JIRA_SUBDOMAIN}.atlassian.net/browse/${key}${formated.modeEscape}\n`;
 }

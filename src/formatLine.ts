@@ -14,10 +14,9 @@ async function issueIsUS(issue: Issue) {
   const usFormatted = formatUS(issue);
   let subFormatted = "";
   if (usFormatted !== "") subFormatted = await formatSubtasks(issue);
-  const result =
-    usFormatted +
-    subFormatted +
-    `${usFormatted === "" ? "" : formatLink(issue.key)}`;
+  const result = `${usFormatted}${subFormatted}${
+    usFormatted === "" ? "" : formatLink(issue.key)
+  }`;
   return result;
 }
 
@@ -31,26 +30,19 @@ async function issueIsSub(issue: Issue) {
     });
     const subFormatted = await formatSingleSubtask(issue);
     const parentFormatted = formatUS(parentIssue);
-    return (
-      `${formated.modeBold}${formated.colorWarning}[👮‍ ` +
-      issue.key +
-      ` is a TASK] ${formated.modeEscape}` +
-      parentFormatted +
-      `${subFormatted === "" ? "" : `\n${subFormatted}\n`}` +
-      `${
+    return `${formated.modeBold}${formated.colorWarning}[👮‍ ${
+      issue.key
+    } is a TASK]${formated.modeEscape} ${parentFormatted}\
+    ${subFormatted === "" ? "" : `\n${subFormatted}\n`} \
+      ${
         parentFormatted === ""
           ? parentFormatted === "" && subFormatted === ""
             ? "\n"
             : formatLink(parentIssue.key)
           : ""
-      }`
-    );
+      }`;
   } catch (error) {
-    return (
-      `${formated.modeBold}${formated.colorWarning}[TASK ` +
-      issue.key +
-      ` has no US]${formated.modeEscape}`
-    );
+    return `${formated.modeBold}${formated.colorWarning}[TASK ${issue.key} has no US]${formated.modeEscape}`;
   }
 }
 
