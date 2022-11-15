@@ -25,9 +25,9 @@ const optionDefinitions = [
   { name: "disableChecks", alias: "d", type: Boolean },
 ];
 
+let options = [];
 try {
-  const options = commandLineArgs(optionDefinitions);
-  console.log("options: ", options);
+  options = commandLineArgs(optionDefinitions);
 } catch {
   console.log(
     "Wrong options. Available options are\n--onlyWarnings (-w),\n--table (-t),\n--disableChecks (-d)."
@@ -112,7 +112,7 @@ async function useLocalChangelog() {
   });
   for await (const line of r) {
     const formatedLine = await checkRelease(line);
-    console.log(formatedLine);
+    if (formatedLine !== "") console.log(formatedLine);
   }
 }
 
@@ -122,8 +122,8 @@ async function main() {
     return console.log(
       "Wrong credentials. Please verify JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variables."
     );
-  // useStandardVersion();
-  useLocalChangelog();
+  useStandardVersion();
+  // useLocalChangelog();
 }
 
 async function formatSingleSubtask(sub) {
@@ -144,28 +144,32 @@ async function formatSingleSubtask(sub) {
       assigneeName = "no-assignee";
     }
   }
-  return (
-    modeDim +
-    `${isReady ? colorReady : isProd ? colorDefault : colorNotReady}` +
-    `(${
-      isReady
-        ? `✅ ${sub.fields.status.name}`
-        : isProd
-        ? `👌`
-        : `👎 ${sub.fields.status.name} @${assigneeName}`
-    } ${sub.key})` +
-    modeEscape
-  );
+  if (options && options.onlyWarnings) {
+    if (!isReady && !isProd)
+      return `${modeDim}${colorNotReady}(👎 ${sub.fields.status.name} \
+        @${assigneeName} ${sub.key})${modeEscape}`;
+    return "";
+  }
+  return `${modeDim}${
+    isReady ? colorReady : isProd ? colorDefault : colorNotReady
+  }(${
+    isReady
+      ? `✅ ${sub.fields.status.name}`
+      : isProd
+      ? `👌`
+      : `👎 ${sub.fields.status.name} @${assigneeName}`
+  } ${sub.key})${modeEscape}`;
 }
 
 async function formatSubtasks(issue) {
-  let subTasks = "\n";
+  let subTasks = "";
   let color = colorReady;
 
   for await (const sub of issue.fields.subtasks) {
     subTasks += await formatSingleSubtask(sub);
   }
-  return subTasks + `\n`;
+  if (subTasks !== "") return `\n` + subTasks + `\n`;
+  return "";
 }
 
 function formatUS(issue) {
@@ -173,37 +177,37 @@ function formatUS(issue) {
     issue.fields.status.name === process.env.JIRA_US_RELEASE_STATUS;
   const isUsReady =
     issue.fields.status.name === process.env.JIRA_US_READY_TO_RELEASE_STATUS;
-  return (
-    `${modeBold}${
-      isUsInProd
-        ? `${colorNoAction}[🚀`
-        : isUsReady
-        ? `${colorReady}[✅ `
-        : `${colorNotReady}[❌ `
-    }` +
-    `${isUsInProd ? "" : issue.fields.status.name}` +
-    `]` +
-    ` (${issue.key})` +
-    `${
-      isUsReady ? `` : isUsInProd ? `` : ` @` + issue.fields.creator.displayName
-    }` +
-    ` ${issue.fields.summary}${modeEscape}`
-  );
+
+  if (options && options.onlyWarnings) {
+    if (!isUsReady && !isUsInProd)
+      return `${modeBold}${colorNotReady}[❌ ${issue.fields.status.name}](${issue.key}) \
+      @${issue.fields.creator.displayName} ${issue.fields.summary}${modeEscape}`;
+    return "";
+  }
+  return `${modeBold}${
+    isUsInProd
+      ? `${colorNoAction}[🚀`
+      : isUsReady
+      ? `${colorReady}[✅ `
+      : `${colorNotReady}[❌ `
+  }${isUsInProd ? "" : issue.fields.status.name}] (${issue.key})${
+    isUsReady ? `` : isUsInProd ? `` : ` @ ${issue.fields.creator.displayName}`
+  } ${issue.fields.summary}${modeEscape}`;
 }
 
 function formatLink(key) {
-  return `${modeLink}${
-    "https://" +
-    process.env.JIRA_SUBDOMAIN +
-    ".atlassian.net" +
-    "/browse/" +
-    key
-  }${modeEscape}\n`;
+  return `${modeLink}https://${process.env.JIRA_SUBDOMAIN}.atlassian.net/browse/${key}${modeEscape}\n`;
 }
 
 async function issueIsUS(issue) {
-  let subTasks = await formatSubtasks(issue);
-  return formatUS(issue) + subTasks + formatLink(issue.key);
+  const usFormatted = formatUS(issue);
+  let subFormatted = "";
+  if (usFormatted !== "") subFormatted = await formatSubtasks(issue);
+  const result =
+    usFormatted +
+    subFormatted +
+    `${usFormatted === "" ? "" : formatLink(issue.key)}`;
+  return result;
 }
 
 async function issueIsSub(issue) {
@@ -211,22 +215,21 @@ async function issueIsSub(issue) {
     const parentIssue = await client.issues.getIssue({
       issueIdOrKey: issue.fields.parent.key,
     });
-    return (
-      `${modeBold}${colorWarning}[👮‍ ` +
-      issue.key +
-      ` is a TASK] amend commit for => ${modeEscape}` +
-      formatUS(parentIssue) +
-      `\n` +
-      (await formatSingleSubtask(issue)) +
-      `\n` +
-      formatLink(parentIssue.key)
-    );
+    const subFormatted = await formatSingleSubtask(issue);
+    const parentFormatted = await formatUS(parentIssue);
+    return `${modeBold}${colorWarning}[👮‍ ${
+      issue.key
+    } is a TASK]${modeEscape} ${parentFormatted}\
+    ${subFormatted === "" ? "" : `\n${subFormatted}\n`} \
+      ${
+        parentFormatted === ""
+          ? parentFormatted === "" && subFormatted === ""
+            ? "\n"
+            : formatLink(parentIssue.key)
+          : ""
+      }`;
   } catch (error) {
-    return (
-      `${modeBold}${colorWarning}[TASK ` +
-      issue.key +
-      ` has no US]${modeEscape}`
-    );
+    return `${modeBold}${colorWarning}[TASK ${issue.key} has no US]${modeEscape}`;
   }
 }
 
@@ -252,9 +255,8 @@ async function checkRelease(line) {
   }
   if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
     return await issueIsUS(issue);
-  } else if (issue.fields.subtasks.length <= 0) {
-    return await issueIsSub(issue);
   }
+  return await issueIsSub(issue);
 }
 
 main();
