@@ -38,7 +38,11 @@ async function useStandardVersion() {
 }
 
 async function useLocalChangelog() {
-  var user_file = "./CHANGELOG.md";
+  if (!process.env.CHANGELOG_FILE)
+    throw new Error("Please set CHANGELOG_FILE variable in .env.");
+  if (!fs.existsSync(process.env.CHANGELOG_FILE))
+    throw new Error("File referenced by CHANGELOG_FILE variable in .env does not exist.");
+  var user_file = process.env.CHANGELOG_FILE;
   var r = readline.createInterface({
     input: fs.createReadStream(user_file),
   });
