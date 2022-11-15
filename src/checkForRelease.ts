@@ -1,8 +1,9 @@
 import fs from "fs";
 import readline from "readline";
 import standardVersion from "standard-version";
-import { formatLine } from "./formatLine";
+import { getLine } from "./getLine";
 import { getEnvVariables } from "./getEnvVariables";
+import { ILine, ILineEmpty, ILineNoUS } from "./globals/interfaces";
 
 main();
 async function main() {
@@ -32,7 +33,7 @@ async function useStandardVersion() {
   // // Release the interception of the console
   process.stdout.write = outputOrigin;
   for (const line of interceptedContent[0].split("\n")) {
-    const formatedLine = await formatLine(line);
+    const formatedLine = await getLine(line);
     console.log(formatedLine);
   }
 }
@@ -41,13 +42,17 @@ async function useLocalChangelog() {
   if (!process.env.CHANGELOG_FILE)
     throw new Error("Please set CHANGELOG_FILE variable in .env.");
   if (!fs.existsSync(process.env.CHANGELOG_FILE))
-    throw new Error("File referenced by CHANGELOG_FILE variable in .env does not exist.");
+    throw new Error(
+      "File referenced by CHANGELOG_FILE variable in .env does not exist."
+    );
   var user_file = process.env.CHANGELOG_FILE;
   var r = readline.createInterface({
     input: fs.createReadStream(user_file),
   });
   for await (const line of r) {
-    const formatedLine = await formatLine(line);
-    if (formatedLine !== "") console.log(formatedLine);
+    const formatedLine: ILine | ILineNoUS | ILineEmpty | undefined =
+      await getLine(line);
+    // if (formatedLine !== "")
+    console.log(formatedLine);
   }
 }
