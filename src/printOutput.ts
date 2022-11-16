@@ -19,9 +19,9 @@ const printRegular = (
     if (isILineNoUS(lineObj)) {
       formatedLine = `${lineObj.textMode}${lineObj.textColor}${lineObj.warningText}${_gASCII.modeEscape} ${lineObj.text}`;
     } else if (isILine(lineObj)) {
+      if (lineObj.US.warningType)
+        formatedLine = `${_gASCII.modeBold}${_gASCII.colorWarning}${lineObj.US.warningText}${_gASCII.modeEscape} `;
       if (!isWarning) {
-        if (lineObj.US.warningType)
-          formatedLine = `${_gASCII.modeBold}${_gASCII.colorWarning}${lineObj.US.warningText}${_gASCII.modeEscape} `;
         formatedLine += `${lineObj.US.textMode}${lineObj.US.textColor}${
           lineObj.US.statusText
         }${
@@ -34,17 +34,6 @@ const printRegular = (
             formatedLine += `${subtask.textMode}${subtask.textColor}(${subtask.statusText} ${subtask.number})${_gASCII.modeEscape}`;
           }
           formatedLine += `\n`;
-        }
-      } else {
-        if (lineObj.US.warningType) {
-          formatedLine = `${_gASCII.modeBold}${_gASCII.colorWarning}${lineObj.US.warningText}${_gASCII.modeEscape} `;
-          formatedLine += `${lineObj.US.textMode}${lineObj.US.textColor}${
-            lineObj.US.statusText
-          }${
-            lineObj.US.statusType === "isNotOk"
-              ? ` @${lineObj.US.assignee}`
-              : ``
-          } ${lineObj.US.title}${_gASCII.modeEscape}`;
         }
       }
     } else if (isILineEmpty(lineObj) && !isWarning)
