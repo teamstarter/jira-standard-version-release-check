@@ -1,5 +1,3 @@
-import { ILine } from "./interfaces";
-
 export const _gASCII = {
   modeDefault: "\x1b[",
   modeBold: "\x1b[1;",
@@ -12,5 +10,3 @@ export const _gASCII = {
   colorDefault: "39m",
   modeEscape: "\x1b[0m",
 };
-
-export let _gConsoleOutputArray: ILine[] = [];

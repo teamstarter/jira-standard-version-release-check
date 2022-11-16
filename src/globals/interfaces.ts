@@ -6,38 +6,74 @@ export interface IOptionsArguments {
 
 export interface IUserStory {
   warningType?: WarningTypes;
-  status: StatusTypes;
+  warningText?: string;
+  warningTaskNumber?: string;
+  statusType: StatusTypes;
+  statusJira: string;
+  statusText?: string;
   showSubtasks: boolean;
   number: string;
-  assignee: string | undefined;
+  assignee: string;
   title: string;
+  textColor: string;
+  textMode: string;
   link: string;
 }
 export interface ISubtask {
-  status: StatusTypes;
+  statusType: StatusTypes;
+  statusJira: string;
+  statusText?: string;
   assignee: string;
   number: string;
+  textColor: string;
+  textMode: string;
 }
 
 export interface ILine {
+  lineType: LineTypes;
   US: IUserStory;
   tasks?: ISubtask[];
 }
 
 export interface ILineNoUS {
+  lineType: LineTypes;
   warningType: WarningTypes;
-  text: string;
+  warningText?: string;
+  USNunber?: string;
+  text?: string;
+  textColor: string;
+  textMode: string;
 }
 
 export interface ILineEmpty {
+  lineType: LineTypes;
   text: string;
+  textColor: string;
+  textMode: string;
 }
 
 export type WarningTypes =
-  | "NoUS"
   | "MissUSNb"
   | "FetchErr"
-  | "USNotFound"
+  | "WrongUsNumber"
   | "USIsTask";
 
+export type LineTypes = "ILineNoUS" | "ILineEmpty" | "ILine";
+
 export type StatusTypes = "isNotOk" | "isProd" | "isReadyToRelease";
+
+export function isILine(
+  line: ILine | ILineNoUS | ILineEmpty | undefined
+): line is ILine {
+  return (line as ILine).lineType === "ILine";
+}
+export function isILineEmpty(
+  line: ILine | ILineNoUS | ILineEmpty | undefined
+): line is ILineEmpty {
+  return (line as ILineEmpty).lineType === "ILineEmpty";
+}
+export function isILineNoUS(
+  line: ILine | ILineNoUS | ILineEmpty | undefined
+): line is ILineNoUS {
+  return (line as ILineNoUS).lineType === "ILineNoUS";
+}

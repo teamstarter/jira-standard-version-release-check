@@ -17,7 +17,8 @@ async function issueIsUS(issue: Issue) {
   let subtasks: ISubtask[] = [];
 
   if (userStory.showSubtasks) subtasks = await getSubtasks(issue);
-  return <ILine>{ US: userStory, tasks: subtasks };
+  const result: ILine = { lineType: "ILine", US: userStory, tasks: subtasks };
+  return result;
 }
 
 async function issueIsSub(issue: Issue) {
@@ -29,12 +30,20 @@ async function issueIsSub(issue: Issue) {
       issueIdOrKey: issue.fields.parent!.key,
     });
     let subtask: ISubtask[] = [];
-    subtask.push(await getSingleSubtask(issue));
+    // subtask.push(await getSingleSubtask(issue));
 
     const userStory: IUserStory = getUs(parentIssue, "USIsTask");
-    return <ILine>{ US: userStory, tasks: subtask };
+    userStory.warningTaskNumber = issue.key;
+    const result: ILine = { lineType: "ILine", US: userStory, tasks: subtask };
+    return result;
   } catch (error) {
-    return <ILineNoUS>{ warningType: "NoUS" };
+    const result: ILineNoUS = {
+      lineType: "ILineNoUS",
+      warningType: "FetchErr",
+      textColor: _gASCII.colorWarning,
+      textMode: _gASCII.modeBold,
+    };
+    return result;
   }
 }
 
@@ -42,33 +51,57 @@ export async function getLine(line: string) {
   const client = await SClient.getClient();
 
   if (!line) {
-    return <ILineEmpty>{ text: line };
+    const result: ILineEmpty = {
+      lineType: "ILineEmpty",
+      text: line,
+      textColor: _gASCII.colorDefault,
+      textMode: _gASCII.modeDim,
+    };
+    return result;
   }
   const issueId = getJiraUSFromText(line);
   if (!issueId) {
     if (line.search(/:\*\*/) !== -1) {
-      return <ILineNoUS>{
+      const result: ILineNoUS = {
+        lineType: "ILineNoUS",
         warningType: "MissUSNb",
         text: line,
+        textColor: _gASCII.colorWarning,
+        textMode: _gASCII.modeBold,
       };
+      return result;
     }
-    return <ILineEmpty>{ text: line };
+    const result: ILineEmpty = {
+      lineType: "ILineEmpty",
+      text: line,
+      textColor: _gASCII.colorDefault,
+      textMode: _gASCII.modeDim,
+    };
+    return result;
   }
   let issue: Issue;
   try {
     issue = await client.issues.getIssue({ issueIdOrKey: issueId });
   } catch (err) {
-    return <ILineNoUS>{
-      warningType: "FetchErr",
+    const result: ILineNoUS = {
+      lineType: "ILineNoUS",
+      warningType: "WrongUsNumber",
       text: line,
+      textColor: _gASCII.colorWarning,
+      textMode: _gASCII.modeBold,
     };
+    return result;
   }
-  if (!issue) {
-    return <ILineNoUS>{
-      warningType: "USNotFound",
-      text: line,
-    };
-  }
+  // if (!issue) {
+  //   const result: ILineNoUS = {
+  //     lineType: "ILineNoUS",
+  //     warningType: "WrongUsNumber",
+  //     text: line,
+  //     textColor: _gASCII.colorWarning,
+  //     textMode: _gASCII.modeBold,
+  //   };
+  //   return result;
+  // }
   if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
     return await issueIsUS(issue);
   } else if (issue.fields.subtasks.length <= 0) {

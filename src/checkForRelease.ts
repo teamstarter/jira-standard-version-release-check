@@ -4,6 +4,9 @@ import standardVersion from "standard-version";
 import { getLine } from "./getLine";
 import { getEnvVariables } from "./getEnvVariables";
 import { ILine, ILineEmpty, ILineNoUS } from "./globals/interfaces";
+import { table } from "console";
+import { formatLine } from "./formatLine";
+import { printOutput } from "./printOutput";
 
 main();
 async function main() {
@@ -32,10 +35,15 @@ async function useStandardVersion() {
   });
   // // Release the interception of the console
   process.stdout.write = outputOrigin;
+
+  let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
   for (const line of interceptedContent[0].split("\n")) {
-    const formatedLine = await getLine(line);
-    console.log(formatedLine);
+    const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
+      line
+    );
+    consoleOutputArray.push(formatLine(lineObj));
   }
+  printOutput(consoleOutputArray);
 }
 
 async function useLocalChangelog() {
@@ -49,10 +57,12 @@ async function useLocalChangelog() {
   var r = readline.createInterface({
     input: fs.createReadStream(user_file),
   });
+  let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
   for await (const line of r) {
-    const formatedLine: ILine | ILineNoUS | ILineEmpty | undefined =
-      await getLine(line);
-    // if (formatedLine !== "")
-    console.log(formatedLine);
+    const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
+      line
+    );
+    consoleOutputArray.push(formatLine(lineObj));
   }
+  printOutput(consoleOutputArray);
 }
