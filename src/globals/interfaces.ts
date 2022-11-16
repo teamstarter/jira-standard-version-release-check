@@ -2,6 +2,7 @@ export interface IOptionsArguments {
   onlyWarnings: boolean;
   table: boolean;
   disableChecks: boolean;
+  help?: boolean;
 }
 
 export interface IRow {
