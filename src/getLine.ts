@@ -30,7 +30,6 @@ async function issueIsSub(issue: Issue) {
       issueIdOrKey: issue.fields.parent!.key,
     });
     let subtask: ISubtask[] = [];
-    // subtask.push(await getSingleSubtask(issue));
 
     const userStory: IUserStory = getUs(parentIssue, "USIsTask");
     userStory.warningTaskNumber = issue.key;
@@ -92,16 +91,6 @@ export async function getLine(line: string) {
     };
     return result;
   }
-  // if (!issue) {
-  //   const result: ILineNoUS = {
-  //     lineType: "ILineNoUS",
-  //     warningType: "WrongUsNumber",
-  //     text: line,
-  //     textColor: _gASCII.colorWarning,
-  //     textMode: _gASCII.modeBold,
-  //   };
-  //   return result;
-  // }
   if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
     return await issueIsUS(issue);
   } else if (issue.fields.subtasks.length <= 0) {

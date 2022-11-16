@@ -42,8 +42,6 @@ const printRegular = (
         }
       }
     }
-    // else if (isILineEmpty(lineObj) && !isWarning)
-    //   formatedLine = `${lineObj.textMode}${lineObj.textColor}${lineObj.text}${_gASCII.modeEscape}`;
     if (formatedLine !== "") console.log(formatedLine);
   }
 };
