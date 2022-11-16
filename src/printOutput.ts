@@ -7,6 +7,7 @@ import {
   isILine,
   isILineNoUS,
   IOptionsArguments,
+  IRow,
 } from "./globals/interfaces";
 import { SOptions } from "./setUpOptions";
 
@@ -35,11 +36,62 @@ const printRegular = (
           }
           formatedLine += `\n`;
         }
+        if (lineObj.US.statusType === "isReadyToRelease") {
+          if (formatedLine.slice(-1) !== `\n`) formatedLine += `\n`;
+          formatedLine += `${_gASCII.modeDim}${_gASCII.colorDefault}${lineObj.US.link}${_gASCII.modeEscape}\n`;
+        }
       }
-    } else if (isILineEmpty(lineObj) && !isWarning)
-      formatedLine = `${lineObj.textMode}${lineObj.textColor}${lineObj.text}${_gASCII.modeEscape}`;
+    }
+    // else if (isILineEmpty(lineObj) && !isWarning)
+    //   formatedLine = `${lineObj.textMode}${lineObj.textColor}${lineObj.text}${_gASCII.modeEscape}`;
     if (formatedLine !== "") console.log(formatedLine);
   }
+};
+
+const printTab = (
+  output: (ILine | ILineNoUS | ILineEmpty | undefined)[],
+  isWarning: boolean
+) => {
+  let table: IRow[] = [];
+  for (const lineObj of output) {
+    if (lineObj === undefined || isILineEmpty(lineObj)) continue;
+
+    let formatedRow: IRow | undefined;
+    if (isILineNoUS(lineObj)) {
+      formatedRow = {
+        USstatus: lineObj.warningText!,
+        USTitle: lineObj.text!.substring(0, 70) + `...`,
+      };
+    }
+    let subtaskTab: string[] | undefined;
+
+    if (isILine(lineObj)) {
+      if (lineObj.US.warningType) {
+        formatedRow = {
+          USstatus: lineObj.US.warningText!,
+          USNumber: lineObj.US.number,
+          USTitle: lineObj.US.title.substring(0, 70) + `...`,
+          
+        };
+      } else if (!isWarning) {
+        if (lineObj.tasks && lineObj.tasks.length > 0) {
+          subtaskTab = [];
+          for (const subtask of lineObj.tasks) {
+            subtaskTab.push(`(${subtask.statusText} ${subtask.number})`);
+          }
+        }
+        formatedRow = {
+          USstatus: lineObj.US.statusText!,
+          USNumber: lineObj.US.number,
+          USTitle: lineObj.US.title.substring(0, 70) + `...`,
+        };
+      }
+      if (subtaskTab !== undefined && formatedRow !== undefined)
+        formatedRow.TasksText = subtaskTab;
+    }
+    if (formatedRow !== undefined) table.push(formatedRow);
+  }
+  console.table(table);
 };
 
 export const printOutput = (
@@ -47,9 +99,7 @@ export const printOutput = (
 ) => {
   if (output === undefined) return;
   const options = SOptions.getOptions();
-  if (options.table && options.onlyWarnings) {
-  } else if (options.table) {
-  } else {
-  }
-  printRegular(output, options.onlyWarnings);
+  if (options.table) {
+    printTab(output, options.onlyWarnings);
+  } else printRegular(output, options.onlyWarnings);
 };

@@ -4,7 +4,6 @@ import standardVersion from "standard-version";
 import { getLine } from "./getLine";
 import { getEnvVariables } from "./getEnvVariables";
 import { ILine, ILineEmpty, ILineNoUS } from "./globals/interfaces";
-import { table } from "console";
 import { formatLine } from "./formatLine";
 import { printOutput } from "./printOutput";
 

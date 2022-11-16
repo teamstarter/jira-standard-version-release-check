@@ -4,6 +4,16 @@ export interface IOptionsArguments {
   disableChecks: boolean;
 }
 
+export interface IRow {
+  USstatus: string;
+  USNumber?: string;
+  USTitle?: string;
+  USAssignee?: string;
+  TasksText?: string[];
+  link?: string;
+  ErrorText?: string;
+}
+
 export interface IUserStory {
   warningType?: WarningTypes;
   warningText?: string;
