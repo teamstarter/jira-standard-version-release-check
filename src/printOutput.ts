@@ -56,32 +56,34 @@ const printTab = (
 
     let formatedRow: IRow | undefined;
     if (isILineNoUS(lineObj)) {
+      const title = lineObj.text!.split(/\(\[.+\]\(.+\)/)[0];
       formatedRow = {
         USstatus: lineObj.warningText!,
-        USTitle: lineObj.text!.substring(0, 70) + `...`,
+        USTitle: title,
       };
     }
     let subtaskTab: string[] | undefined;
 
     if (isILine(lineObj)) {
+      const title = lineObj.US.title.split(/\(\[.+\]\(.+\)/)[0];
       if (lineObj.US.warningType) {
         formatedRow = {
           USstatus: lineObj.US.warningText!,
           USNumber: lineObj.US.number,
-          USTitle: lineObj.US.title.substring(0, 70) + `...`,
-          
+          USTitle: title,
         };
       } else if (!isWarning) {
         if (lineObj.tasks && lineObj.tasks.length > 0) {
           subtaskTab = [];
           for (const subtask of lineObj.tasks) {
-            subtaskTab.push(`(${subtask.statusText} ${subtask.number})`);
+            if (subtask.statusType === "isReadyToRelease")
+              subtaskTab.push(`(${subtask.statusText} ${subtask.number})`);
           }
         }
         formatedRow = {
           USstatus: lineObj.US.statusText!,
           USNumber: lineObj.US.number,
-          USTitle: lineObj.US.title.substring(0, 70) + `...`,
+          USTitle: lineObj.US.title,
         };
       }
       if (subtaskTab !== undefined && formatedRow !== undefined)
