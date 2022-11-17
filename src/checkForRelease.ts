@@ -6,15 +6,17 @@ import { getEnvVariables } from "./getEnvVariables";
 import { ILine, ILineEmpty, ILineNoUS } from "./globals/interfaces";
 import { formatLine } from "./formatLine";
 import { printOutput } from "./printOutput";
+import { SOptions } from "./setUpOptions";
 
 main();
 async function main() {
   getEnvVariables();
-  // useStandardVersion();
-  useLocalChangelog();
+  useStandardVersion();
+  // useLocalChangelog();
 }
 
 async function useStandardVersion() {
+  const options = SOptions.getOptions();
   // standard version do not provide a way to get the output
   // So we intercept it!
   const interceptedContent: String[] = [];
@@ -40,7 +42,8 @@ async function useStandardVersion() {
     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
       line
     );
-    consoleOutputArray.push(formatLine(lineObj));
+    if (options.disableChecks) console.log(line);
+    else consoleOutputArray.push(formatLine(lineObj));
   }
   printOutput(consoleOutputArray);
 }
