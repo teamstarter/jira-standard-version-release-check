@@ -1,5 +1,5 @@
 import { Issue } from "jira.js/out/version3/models/issue";
-import { getUs, getSubtasks, makeLink, getSingleSubtask } from "./getJiraTasks";
+import { getUs, getSubtasks } from "./getJiraTasks";
 import { getJiraUSFromText } from "./getJiraUSFromText";
 import { _gASCII } from "./globals/globals";
 import {
@@ -10,6 +10,7 @@ import {
   IUserStory,
 } from "./globals/interfaces";
 import { SClient } from "./setUpJiraClient";
+import { SOptions } from "./setUpOptions";
 
 async function issueIsUS(issue: Issue) {
   if (!issue) throw new Error();

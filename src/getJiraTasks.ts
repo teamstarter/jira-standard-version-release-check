@@ -10,6 +10,7 @@ import { SClient } from "./setUpJiraClient";
 import { SOptions } from "./setUpOptions";
 
 export function getUs(issue: Issue, warning?: WarningTypes) {
+  const options = SOptions.getOptions();
   const statusName = issue.fields.status.name;
   const assigneeName = issue.fields.creator.displayName;
   const isUsInProd = statusName === process.env.JIRA_US_RELEASE_STATUS;
@@ -25,11 +26,20 @@ export function getUs(issue: Issue, warning?: WarningTypes) {
     status = "isProd";
     color = _gASCII.colorNoAction;
   }
+  let showTasks: boolean = true;
+
+  if (status === "isNotOk") {
+    if (options.table) showTasks = false;
+    if (options.onlyWarnings) showTasks = false;
+    else showTasks = true;
+  } else showTasks = false;
+  if (options.table) showTasks = false;
+  else if (options.onlyWarnings) showTasks = false;
 
   const result: IUserStory = {
     warningType: warning,
-    showSubtasks: (!isUsReady && !isUsInProd) || isUsReady,
     statusType: status,
+    showSubtasks: showTasks,
     statusJira: statusName ? statusName : "status-undefined",
     number: issue.key,
     assignee: assigneeName ? assigneeName : "no-assignee",
