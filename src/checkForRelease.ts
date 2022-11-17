@@ -1,8 +1,11 @@
 import fs from "fs";
 import readline from "readline";
 import standardVersion from "standard-version";
-import { formatLine } from "./formatLine";
+import { getLine } from "./getLine";
 import { getEnvVariables } from "./getEnvVariables";
+import { ILine, ILineEmpty, ILineNoUS } from "./globals/interfaces";
+import { formatLine } from "./formatLine";
+import { printOutput } from "./printOutput";
 import { SOptions } from "./setUpOptions";
 
 main();
@@ -33,13 +36,16 @@ async function useStandardVersion() {
   });
   // // Release the interception of the console
   process.stdout.write = outputOrigin;
+
+  let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
   for (const line of interceptedContent[0].split("\n")) {
+    const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
+      line
+    );
     if (options.disableChecks) console.log(line);
-    else {
-      const formatedLine = await formatLine(line);
-      console.log(formatedLine);
-    }
+    else consoleOutputArray.push(formatLine(lineObj));
   }
+  printOutput(consoleOutputArray);
 }
 
 async function useLocalChangelog() {
@@ -53,8 +59,12 @@ async function useLocalChangelog() {
   var r = readline.createInterface({
     input: fs.createReadStream(user_file),
   });
+  let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
   for await (const line of r) {
-    const formatedLine = await formatLine(line);
-    if (formatedLine !== "") console.log(formatedLine);
+    const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
+      line
+    );
+    consoleOutputArray.push(formatLine(lineObj));
   }
+  printOutput(consoleOutputArray);
 }
