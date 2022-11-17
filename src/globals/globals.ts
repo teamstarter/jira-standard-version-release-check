@@ -1,4 +1,4 @@
-export const formated = {
+export const _gASCII = {
   modeDefault: "\x1b[",
   modeBold: "\x1b[1;",
   modeDim: "\x1b[2;",
