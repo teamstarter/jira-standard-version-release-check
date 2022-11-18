@@ -1,33 +1,48 @@
 {
-  "name": "@teamstarter/jira-standard-version-release-check",
-  "version": "1.0.5",
+  "name": "jira-standard-version-release-check",
+  "version": "1.2.5",
   "description": "A small tool to easily check if commits related to a User Story and their task is ready to be released in production.",
-  "main": "checkForRelease.ts",
+  "main": "dist/checkForRelease.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "bin": {
+    "check-release": "./bin/check-release.js"
+  },
+  "engines": {
+    "node": ">=18.12.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "release": "standard-version",
-    "start:dev": "ts-node ./src/checkForRelease.ts",
-    "start:break": "node --inspect -r ts-node/register ./src/checkForRelease.ts"
+    "dev": "ts-node ./src/checkForRelease.ts",
+    "debbug": "node --inspect -r ts-node/register ./src/checkForRelease.ts",
+    "compile": "rm -rf dist/* && tsc",
+    "clean": "rm -rf dist/*",
+    "check-release": "node ./bin/check-release.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/teamstarter/jira-standard-version-release-check.git"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "email": "marielou.valdes@gmail.com",
+    "name": "Marie-Lou Valdes"
+  },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/teamstarter/jira-standard-version-release-check/issues"
   },
   "homepage": "https://github.com/teamstarter/jira-standard-version-release-check#readme",
   "dependencies": {
-    "@types/capture-console": "^1.0.1",
     "dotenv": "^16.0.3",
     "dotenv-expand": "^9.0.0",
     "jira.js": "^2.15.14",
     "standard-version": "^9.5.0"
   },
   "devDependencies": {
+    "@types/capture-console": "^1.0.1",
     "@types/node": "^18.11.9",
     "@types/standard-version": "^7.0.1",
     "@typescript-eslint/eslint-plugin": "^5.42.1",

@@ -8,12 +8,11 @@ import { formatLine } from "./formatLine";
 import { printOutput } from "./printOutput";
 import { SOptions } from "./setUpOptions";
 
-main();
-async function main() {
+module.exports = async function main() {
   getEnvVariables();
   useStandardVersion();
   // useLocalChangelog();
-}
+};
 
 async function useStandardVersion() {
   const options = SOptions.getOptions();
