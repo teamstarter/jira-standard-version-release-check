@@ -5,7 +5,7 @@
   "main": "dist/checkForRelease.js",
   "types": "dist/types/*",
   "files": [
-    "dist/**/*"
+    "dist/**/*.js", "dist/**/*.d.ts"
   ],
   "bin": {
     "check-release": "./bin/check-release.js"
