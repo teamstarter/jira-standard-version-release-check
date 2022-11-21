@@ -8,10 +8,18 @@ import { formatLine } from "./formatLine";
 import { printOutput } from "./printOutput";
 import { SOptions } from "./setUpOptions";
 
-module.exports = async function main() {
-  getEnvVariables();
-  useStandardVersion();
-};
+if (process.env.CHECK_RELEASE_ENV && process.env.CHECK_RELEASE_ENV === "dev") {
+  main();
+  async function main() {
+    getEnvVariables();
+    useStandardVersion();
+  }
+} else {
+  module.exports = async function main() {
+    getEnvVariables();
+    useStandardVersion();
+  };
+}
 
 async function useStandardVersion() {
   const options = SOptions.getOptions();

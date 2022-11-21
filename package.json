@@ -5,7 +5,8 @@
   "main": "dist/checkForRelease.js",
   "types": "dist/types/*",
   "files": [
-    "dist/**/*.js", "dist/**/*.d.ts"
+    "dist/**/*.js",
+    "dist/**/*.d.ts"
   ],
   "bin": {
     "check-release": "./bin/check-release.js"
@@ -14,11 +15,12 @@
     "node": ">=16.14.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "release": "standard-version",
-    "dev": "ts-node ./src/checkForRelease.ts",
-    "debug": "node --inspect -r ts-node/register ./src/checkForRelease.ts",
-    "compile": "rm -rf dist/* && tsc",
+    "dev": "CHECK_RELEASE_ENV=dev ts-node ./src/checkForRelease.ts",
+    "prod": "npm run clean && tsc && node ./bin/check-release.js",
+    "debug": "CHECK_RELEASE_ENV=dev node --inspect -r ts-node/register ./src/checkForRelease.ts",
+    "compile": "npm run clean && tsc",
+    "publish": "npm run compile && npm publish --access=public",
     "clean": "rm -rf dist/*",
     "check-release": "node ./bin/check-release.js"
   },
