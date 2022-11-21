@@ -1,3 +1,5 @@
 node_modules
 .env
 CHANGELOG.md
+dist/*.map
+dist/*/*.map

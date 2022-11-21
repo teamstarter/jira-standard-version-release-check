@@ -1,8 +1,9 @@
 {
   "name": "jira-standard-version-release-check",
-  "version": "1.2.5",
+  "version": "1.0.0",
   "description": "A small tool to easily check if commits related to a User Story and their task is ready to be released in production.",
   "main": "dist/checkForRelease.js",
+  "types": "dist/types/*",
   "files": [
     "dist/**/*"
   ],
@@ -10,7 +11,7 @@
     "check-release": "./bin/check-release.js"
   },
   "engines": {
-    "node": ">=18.12.1"
+    "node": ">=16.14.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

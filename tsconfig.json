@@ -3,6 +3,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "declaration": true,
+    "declarationDir": "./dist/types",
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
