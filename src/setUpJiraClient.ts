@@ -20,14 +20,20 @@ const setUpClient = () => {
 
 const setUpJiraAPI = async () => {
   const client = setUpClient();
-  const currentUser = await client.myself.getCurrentUser();
-  if (
-    currentUser &&
-    currentUser["status-code" as keyof typeof currentUser] === "401"
-  )
+  try {
+    const currentUser = await client.myself.getCurrentUser();
+    if (
+      currentUser &&
+      currentUser["status-code" as keyof typeof currentUser] === "401"
+    )
+      throw new Error(
+        "Wrong credentials. Please verify JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variables."
+      );
+  } catch (err) {
     throw new Error(
-      "Wrong credentials. Please verify JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN env variables."
+      `Could not authenticate with JIRA_ACCOUNT_EMAIL and JIRA_ACCOUNT_TOKEN from .env file. Are you sure those are valid credentials ?`
     );
+  }
   return client;
 };
 
