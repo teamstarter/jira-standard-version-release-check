@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -9,10 +13,7 @@
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "strict": true,
-    "paths": {
-      "*": ["node_modules/*", "src/types/*"]
-    }
+    "strict": true
   },
   "include": ["src/**/*"]
 }

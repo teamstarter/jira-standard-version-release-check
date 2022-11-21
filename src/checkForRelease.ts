@@ -8,12 +8,10 @@ import { formatLine } from "./formatLine";
 import { printOutput } from "./printOutput";
 import { SOptions } from "./setUpOptions";
 
-main();
-async function main() {
+module.exports = async function main() {
   getEnvVariables();
   useStandardVersion();
-  // useLocalChangelog();
-}
+};
 
 async function useStandardVersion() {
   const options = SOptions.getOptions();
@@ -44,27 +42,6 @@ async function useStandardVersion() {
     );
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
-  }
-  printOutput(consoleOutputArray);
-}
-
-async function useLocalChangelog() {
-  if (!process.env.CHANGELOG_FILE)
-    throw new Error("Please set CHANGELOG_FILE variable in .env.");
-  if (!fs.existsSync(process.env.CHANGELOG_FILE))
-    throw new Error(
-      "File referenced by CHANGELOG_FILE variable in .env does not exist."
-    );
-  var user_file = process.env.CHANGELOG_FILE;
-  var r = readline.createInterface({
-    input: fs.createReadStream(user_file),
-  });
-  let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
-  for await (const line of r) {
-    const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
-      line
-    );
-    consoleOutputArray.push(formatLine(lineObj));
   }
   printOutput(consoleOutputArray);
 }
