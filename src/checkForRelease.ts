@@ -43,5 +43,5 @@ async function useStandardVersion() {
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
-  if (consoleOutputArray.length > 0) printOutput(consoleOutputArray);
+  if (!options.disableChecks) printOutput(consoleOutputArray);
 }
