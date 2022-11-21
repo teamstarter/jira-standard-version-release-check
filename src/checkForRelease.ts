@@ -28,7 +28,7 @@ async function useStandardVersion() {
 
   await standardVersion({
     noVerify: true,
-    infile: "docs/CHANGELOG.md",
+    infile: "CHANGELOG.md",
     silent: true,
     dryRun: true,
   });
@@ -43,5 +43,5 @@ async function useStandardVersion() {
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
-  printOutput(consoleOutputArray);
+  if (consoleOutputArray.length > 0) printOutput(consoleOutputArray);
 }
