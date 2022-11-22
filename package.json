@@ -16,9 +16,9 @@
   },
   "scripts": {
     "release": "standard-version",
-    "dev": "CHECK_RELEASE_ENV=dev ts-node ./src/checkForRelease.ts",
+    "dev": "CHECK_RELEASE_ENV=dev USE_CHANGELOG_ENV=true ts-node ./src/checkForRelease.ts",
     "prod": "npm run clean && tsc && node ./bin/check-release.js",
-    "debug": "CHECK_RELEASE_ENV=dev node --inspect -r ts-node/register ./src/checkForRelease.ts",
+    "debug": "CHECK_RELEASE_ENV=dev USE_CHANGELOG_ENV=true node --inspect -r ts-node/register ./src/checkForRelease.ts",
     "compile": "npm run clean && tsc",
     "publish": "npm run compile && npm publish --access=public",
     "clean": "rm -rf dist/*",
