@@ -13,6 +13,7 @@ if (process.env.CHECK_RELEASE_ENV && process.env.CHECK_RELEASE_ENV === "dev") {
   async function main() {
     getEnvVariables();
     useStandardVersion();
+    // useLocalChangelog();
   }
 } else {
   module.exports = async function main() {
@@ -20,6 +21,27 @@ if (process.env.CHECK_RELEASE_ENV && process.env.CHECK_RELEASE_ENV === "dev") {
     useStandardVersion();
   };
 }
+
+// async function useLocalChangelog() {
+//   if (!process.env.CHANGELOG_FILE)
+//     throw new Error("Please set CHANGELOG_FILE variable in .env.");
+//   if (!fs.existsSync(process.env.CHANGELOG_FILE))
+//     throw new Error(
+//       "File referenced by CHANGELOG_FILE variable in .env does not exist."
+//     );
+//   var user_file = process.env.CHANGELOG_FILE;
+//   var r = readline.createInterface({
+//     input: fs.createReadStream(user_file),
+//   });
+//   let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
+//   for await (const line of r) {
+//     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
+//       line
+//     );
+//     consoleOutputArray.push(formatLine(lineObj));
+//   }
+//   printOutput(consoleOutputArray);
+// }
 
 async function useStandardVersion() {
   const options = SOptions.getOptions();
