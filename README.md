@@ -87,11 +87,13 @@ You might encounter the following errors:
 
 ### Output formatting
 
-**[\<US STATUS EMOJI\>** **\<US STATUS** \*(if not in prod)**\*\>**] @**\<ASSIGNEE** \*(if is not ready)**\*\>** **\<US TITLE\>]**
-**\<** List of tasks _(if not in prod)_:
-**(\<task status emoji\> \<task title\> @\<assignee _(if is not ready)_\> \<task key\>)**
-**\>**
-**\<Link to US** \*(if ready)**\*\>**
+```
+[<US STATUS EMOJI> <US STATUS (if not in prod)>] @<ASSIGNEE (if is not ready)> <US TITLE>]
+< List of tasks (if not in prod):
+(<task status emoji> <task title> @<assignee (if is not ready)> <task key>)
+>
+<Link to US (if ready)>
+```
 
 ```
 ┌─────────┬──────────────────────┬──────────┬────────────────┐
