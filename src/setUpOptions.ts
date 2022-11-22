@@ -8,7 +8,7 @@ export const SOptions = (function () {
     const options = parse<IOptionsArguments>({
       onlyWarnings: { type: Boolean, alias: "w" },
       table: { type: Boolean, alias: "t" },
-      disableChecks: { type: Boolean, alias: "c" },
+      disableChecks: { type: Boolean, alias: "d" },
     });
     return options;
   }

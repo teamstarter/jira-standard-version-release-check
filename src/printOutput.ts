@@ -55,21 +55,19 @@ const printTab = (
 
     let formatedRow: IRow | undefined;
     if (isILineNoUS(lineObj)) {
-      const title = lineObj.text!.split(/\(\[.+\]\(.+\)/)[0];
+      const title = lineObj.text!.match(/\*\*.+\*\*.+ /)![0];
       formatedRow = {
         USstatus: lineObj.warningText!,
-        USTitle: title,
+        USTitle: title ? title : "",
       };
     }
-    let subtaskTab: string[] | undefined;
-
     if (isILine(lineObj)) {
-      const title = lineObj.US.title.split(/\(\[.+\]\(.+\)/)[0];
       if (lineObj.US.warningType) {
+        const title = lineObj.US.title.match(/\*\*.+\*\*.+ /)![0];
         formatedRow = {
           USstatus: lineObj.US.warningText!,
           USNumber: lineObj.US.number,
-          USTitle: title,
+          USTitle: title ? title : "",
         };
       } else if (!isWarning) {
         formatedRow = {
@@ -81,7 +79,7 @@ const printTab = (
     }
     if (formatedRow !== undefined) table.push(formatedRow);
   }
-  console.table(table);
+  console.table(table, ["USstatus", "USNumber", "USTitle"]);
 };
 
 export const printOutput = (

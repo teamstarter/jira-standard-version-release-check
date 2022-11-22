@@ -52,7 +52,6 @@ const formatILineEmpty = (lineObj: ILineEmpty) => {
 export const formatLine = (
   lineObj: ILine | ILineNoUS | ILineEmpty | undefined
 ) => {
-  let formatedLine: ILine | ILineNoUS | ILineEmpty | undefined;
 
   if (isILineEmpty(lineObj)) return formatILineEmpty(lineObj);
   if (isILineNoUS(lineObj)) return formatNoUS(lineObj);

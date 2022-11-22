@@ -8,10 +8,44 @@ import { formatLine } from "./formatLine";
 import { printOutput } from "./printOutput";
 import { SOptions } from "./setUpOptions";
 
-module.exports = async function main() {
-  getEnvVariables();
-  useStandardVersion();
-};
+if (process.env.CHECK_RELEASE_ENV && process.env.CHECK_RELEASE_ENV === "dev") {
+  main();
+  async function main() {
+    getEnvVariables();
+    if (
+      process.env.USE_CHANGELOG_ENV &&
+      process.env.USE_CHANGELOG_ENV === "true"
+    )
+      useLocalChangelog();
+    else useStandardVersion();
+  }
+} else {
+  module.exports = async function main() {
+    getEnvVariables();
+    useStandardVersion();
+  };
+}
+
+async function useLocalChangelog() {
+  if (!process.env.CHANGELOG_FILE)
+    throw new Error("Please set CHANGELOG_FILE variable in .env.");
+  if (!fs.existsSync(process.env.CHANGELOG_FILE))
+    throw new Error(
+      "File referenced by CHANGELOG_FILE variable in .env does not exist."
+    );
+  var user_file = process.env.CHANGELOG_FILE;
+  var r = readline.createInterface({
+    input: fs.createReadStream(user_file),
+  });
+  let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
+  for await (const line of r) {
+    const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
+      line
+    );
+    consoleOutputArray.push(formatLine(lineObj));
+  }
+  printOutput(consoleOutputArray);
+}
 
 async function useStandardVersion() {
   const options = SOptions.getOptions();
@@ -28,7 +62,7 @@ async function useStandardVersion() {
 
   await standardVersion({
     noVerify: true,
-    infile: "docs/CHANGELOG.md",
+    infile: "CHANGELOG.md",
     silent: true,
     dryRun: true,
   });
@@ -43,5 +77,5 @@ async function useStandardVersion() {
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
-  printOutput(consoleOutputArray);
+  if (!options.disableChecks) printOutput(consoleOutputArray);
 }
