@@ -14,7 +14,7 @@ The tools provided by this library will allow you to:
 Add the lib and the peer dependencies:
 
 ```
-$ yarn add jira-standard-version-release-check
+$ yarn add @teamstarter/jira-standard-version-release-check
 ```
 
 ⚠️ Caution: release-check requires at least Node v9.11.2 or greater as it is using async/await.

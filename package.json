@@ -1,6 +1,6 @@
 {
-  "name": "jira-standard-version-release-check",
-  "version": "1.0.0",
+  "name": "@teamstarter/jira-standard-version-release-check",
+  "version": "1.0.1",
   "description": "A small tool to easily check if commits related to a User Story and their task is ready to be released in production.",
   "main": "dist/checkForRelease.js",
   "types": "dist/types/*",
@@ -20,7 +20,7 @@
     "prod": "npm run clean && tsc && node ./bin/check-release.js",
     "debug": "CHECK_RELEASE_ENV=dev USE_CHANGELOG_ENV=true node --inspect -r ts-node/register ./src/checkForRelease.ts",
     "compile": "npm run clean && tsc",
-    "publish": "npm run compile && npm publish --access=public",
+    "go-publish": "npm run compile && npm publish --access=public",
     "clean": "rm -rf dist/*",
     "check-release": "node ./bin/check-release.js"
   },
@@ -28,11 +28,29 @@
     "type": "git",
     "url": "git+https://github.com/teamstarter/jira-standard-version-release-check.git"
   },
-  "keywords": [],
+  "keywords": ["jira", "standard-version", "git", "commit", "release"],
   "author": {
     "email": "marielou.valdes@gmail.com",
     "name": "Marie-Lou Valdes"
   },
+  "contributors": [
+    {
+      "email": "vincent.desmares@gmail.com",
+      "name": "Vincent Desmares"
+    },
+    {
+      "email": "azzedine.amrane@gmail.com",
+      "name": "Azzeddine Amrane"
+    },
+    {
+      "email": "bftane@gmail.com",
+      "name": "Friedrich Tane"
+    },
+    {
+      "email": "victor.germain@hetic.net",
+      "name": "Victor Germain"
+    }
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/teamstarter/jira-standard-version-release-check/issues"
