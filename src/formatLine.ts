@@ -36,7 +36,7 @@ const formatILine = (lineObj: ILine) => {
     for (const task of result.tasks) {
       task.statusText = `${
         task.statusType === "isReadyToRelease"
-          ? `✅ ${task.statusType}`
+          ? `✅ ${task.statusJira}`
           : task.statusType === "isProd"
           ? `👌`
           : `👎 ${task.statusJira} @${task.assignee}`

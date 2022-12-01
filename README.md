@@ -1,8 +1,11 @@
+![Illustration](assets/jira-standard-version-release-check-1.png)
+![Illustration tab](assets/jira-standard-version-release-check-2.png)
+
 # jira-standard-version-release-check
 
 A small tool to easily check if commits related to a User Story and their task is ready to be released in production for a scrum project.
 
-## What can I do with release-check ?
+## What can I do with check-release ?
 
 The tools provided by this library will allow you to:
 
@@ -17,20 +20,28 @@ Add the lib and the peer dependencies:
 $ yarn add @teamstarter/jira-standard-version-release-check
 ```
 
-⚠️ Caution: release-check requires at least Node v9.11.2 or greater as it is using async/await.
+⚠️ Caution: check-release requires at least Node v9.11.2 or greater as it is using async/await.
+
+### Setting up for versioning
+
+Check-release uses [standard-version](https://www.npmjs.com/package/standard-version) to generate a changelog based on your commits.
+
+- You need to have a "version" field in your package.json.
+- Follow the [Conventional Commits Specification](http://www.conventionalcommits.org) in your repository.
 
 ### Setting up .env file
 
-You need to add following entries to your .env
+You need to add the following entries in your env or in a .env file located in the current folder.
+⚠️ Caution: the Jira API uses the language set in the Jira app. Be mindful of that when setting the following Jira status values.
 
 ```
 JIRA_ACCOUNT_TOKEN=
 JIRA_ACCOUNT_EMAIL=
 JIRA_US_READY_TO_RELEASE_STATUS=
-JIRA_TASK_READY_TO_RELEASE_STATUS=
-JIRA_SUBDOMAIN=
 JIRA_US_RELEASE_STATUS=
+JIRA_TASK_READY_TO_RELEASE_STATUS=
 JIRA_TASK_RELEASE_STATUS=
+JIRA_SUBDOMAIN=
 JIRA_PROJECT_KEY=
 ```
 
@@ -45,11 +56,10 @@ JIRA_PROJECT_KEY=
 ### Setting up your git commits
 
 Make sure that the commits must contain the US id, like so : `<project-key>-<US number>`
-For example = **`DP-12`**
 
 ## How to use
 
-You can run the library with the cli command: `release-check`
+You can run the library with the cli command: `check-release`
 
 ### Available options
 
@@ -99,4 +109,5 @@ You might encounter the following errors:
 ┌─────────┬──────────────────────┬──────────┬────────────────┐
 │ (index) │       USstatus       │ USNumber │   USTitle      │
 ├─────────┼──────────────────────┼──────────┼───────────────-┤
+└─────────┴──────────────────────┴──────────┴────────────────┘
 ```
