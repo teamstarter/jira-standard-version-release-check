@@ -24,9 +24,7 @@ async function issueIsUS(issue: Issue) {
 
 async function issueIsSub(issue: Issue) {
   const client = await SClient.getClient();
-
   try {
-    if (!issue?.fields?.parent?.key) throw new Error();
     const parentIssue = await client.issues.getIssue({
       issueIdOrKey: issue.fields.parent!.key,
     });
@@ -92,7 +90,10 @@ export async function getLine(line: string) {
     };
     return result;
   }
-  if (issue.fields.subtasks && issue.fields.subtasks.length > 0) {
+  if (
+    (issue.fields.subtasks && issue.fields.subtasks.length > 0) ||
+    !issue?.fields?.parent?.key
+  ) {
     return await issueIsUS(issue);
   } else if (issue.fields.subtasks.length <= 0) {
     return await issueIsSub(issue);

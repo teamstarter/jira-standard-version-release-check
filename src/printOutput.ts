@@ -55,19 +55,19 @@ const printTab = (
 
     let formatedRow: IRow | undefined;
     if (isILineNoUS(lineObj)) {
-      const title = lineObj.text!.match(/\*\*.+\*\*.+ /)![0];
+      const matched = lineObj.text!.match(/\*\*.+\*\*.+ /);
       formatedRow = {
         USstatus: lineObj.warningText!,
-        USTitle: title ? title : "",
+        USTitle: matched ? matched[0] : "",
       };
     }
     if (isILine(lineObj)) {
       if (lineObj.US.warningType) {
-        const title = lineObj.US.title.match(/\*\*.+\*\*.+ /)![0];
+        const matched = lineObj.US.title.match(/\*\*.+\*\*.+ /);
         formatedRow = {
           USstatus: lineObj.US.warningText!,
           USNumber: lineObj.US.number,
-          USTitle: title ? title : "",
+          USTitle: matched ? matched[0] : "",
         };
       } else if (!isWarning) {
         formatedRow = {
