@@ -27,6 +27,7 @@ if (process.env.CHECK_RELEASE_ENV && process.env.CHECK_RELEASE_ENV === "dev") {
 }
 
 async function useLocalChangelog() {
+  const options = SOptions.getOptions();
   if (!process.env.CHANGELOG_FILE)
     throw new Error("Please set CHANGELOG_FILE variable in .env.");
   if (!fs.existsSync(process.env.CHANGELOG_FILE))
@@ -42,9 +43,10 @@ async function useLocalChangelog() {
     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
       line
     );
-    consoleOutputArray.push(formatLine(lineObj));
+    if (options.disableChecks) console.log(line);
+    else consoleOutputArray.push(formatLine(lineObj));
   }
-  printOutput(consoleOutputArray);
+  if (!options.disableChecks) printOutput(consoleOutputArray);
 }
 
 async function useStandardVersion() {

@@ -1,3 +1,6 @@
+![Illustration](assets/jira-standard-version-release-check-1.png)
+![Illustration tab](assets/jira-standard-version-release-check-2.png)
+
 # jira-standard-version-release-check
 
 A small tool to easily check if commits related to a User Story and their task is ready to be released in production for a scrum project.
@@ -22,8 +25,10 @@ $ yarn add @teamstarter/jira-standard-version-release-check
 ### Setting up for versioning
 
 Check-release uses [standard-version](https://www.npmjs.com/package/standard-version) to generate a changelog based on your commits.
+
 - You need to have a "version" field in your package.json.
 - Follow the [Conventional Commits Specification](http://www.conventionalcommits.org) in your repository.
+
 ### Setting up .env file
 
 You need to add the following entries in your env or in a .env file located in the current folder.
@@ -51,7 +56,6 @@ JIRA_PROJECT_KEY=
 ### Setting up your git commits
 
 Make sure that the commits must contain the US id, like so : `<project-key>-<US number>`
-For example = **`DP-12`**
 
 ## How to use
 
@@ -105,4 +109,5 @@ You might encounter the following errors:
 ┌─────────┬──────────────────────┬──────────┬────────────────┐
 │ (index) │       USstatus       │ USNumber │   USTitle      │
 ├─────────┼──────────────────────┼──────────┼───────────────-┤
+└─────────┴──────────────────────┴──────────┴────────────────┘
 ```
