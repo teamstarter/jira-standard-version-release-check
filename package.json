@@ -1,6 +1,6 @@
 {
   "name": "@teamstarter/jira-standard-version-release-check",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A small tool to easily check if commits related to a User Story and their task is ready to be released in production.",
   "main": "dist/checkForRelease.js",
   "types": "dist/types/*",
@@ -28,7 +28,13 @@
     "type": "git",
     "url": "git+https://github.com/teamstarter/jira-standard-version-release-check.git"
   },
-  "keywords": ["jira", "standard-version", "git", "commit", "release"],
+  "keywords": [
+    "jira",
+    "standard-version",
+    "git",
+    "commit",
+    "release"
+  ],
   "author": {
     "email": "marielou.valdes@gmail.com",
     "name": "Marie-Lou Valdes"
