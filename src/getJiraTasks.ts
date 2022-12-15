@@ -13,9 +13,16 @@ export function getUs(issue: Issue, warning?: WarningTypes) {
   const options = SOptions.getOptions();
   const statusName = issue.fields.status.name;
   const assigneeName = issue.fields.creator.displayName;
-  const isUsInProd = statusName === process.env.JIRA_US_RELEASE_STATUS;
-  const isUsReady = statusName === process.env.JIRA_US_READY_TO_RELEASE_STATUS;
+  let isUsInProd = false;
+  let isUsReady = false;
 
+  if (statusName) {
+    if (process.env.JIRA_US_RELEASE_STATUS)
+      isUsInProd = process.env.JIRA_US_RELEASE_STATUS.includes(statusName);
+    if (process.env.JIRA_US_READY_TO_RELEASE_STATUS)
+      isUsReady =
+        process.env.JIRA_US_READY_TO_RELEASE_STATUS.includes(statusName);
+  }
   let status: StatusTypes = "isNotOk";
   let color = _gASCII.colorNotReady;
 
@@ -56,10 +63,16 @@ export async function getSingleSubtask(sub: Issue) {
   let assigneeName;
   const options = SOptions.getOptions();
   const client = await SClient.getClient();
+  let isReady = false;
+  let isProd = false;
 
-  const isReady = statusName === process.env.JIRA_TASK_READY_TO_RELEASE_STATUS;
-  const isProd = statusName === process.env.JIRA_TASK_RELEASE_STATUS;
-
+  if (statusName) {
+    if (process.env.JIRA_TASK_READY_TO_RELEASE_STATUS)
+      isReady =
+        process.env.JIRA_TASK_READY_TO_RELEASE_STATUS.includes(statusName);
+    if (process.env.JIRA_TASK_RELEASE_STATUS)
+      isProd = process.env.JIRA_TASK_RELEASE_STATUS.includes(statusName);
+  }
   let status: StatusTypes = "isNotOk";
   let color = _gASCII.colorNotReady;
 

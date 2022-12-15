@@ -31,7 +31,8 @@ Check-release uses [standard-version](https://www.npmjs.com/package/standard-ver
 
 ### Setting up .env file
 
-You need to add the following entries in your env or in a .env file located in the current folder.
+You need to add the following entries in your env or in a .env file located in the current folder. 
+For all of the 'STATUS' in the env variable, you can set many of them if you delimit them with commas.
 ⚠️ Caution: the Jira API uses the language set in the Jira app. Be mindful of that when setting the following Jira status values.
 
 ```
