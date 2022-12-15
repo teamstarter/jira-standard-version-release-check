@@ -35,7 +35,7 @@ const printRegular = (
           }
           formatedLine += `\n`;
         }
-        if (lineObj.US.statusType === "isReadyToRelease") {
+        if (lineObj.US.statusType === "isNotOk") {
           if (formatedLine.slice(-1) !== `\n`) formatedLine += `\n`;
           formatedLine += `${_gASCII.modeDim}${_gASCII.colorDefault}${lineObj.US.link}${_gASCII.modeEscape}\n`;
         }
