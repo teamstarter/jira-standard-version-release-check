@@ -28,15 +28,15 @@ const formatILine = (lineObj: ILine) => {
     lineObj.US.statusType == "isProd"
       ? `[🚀`
       : lineObj.US.statusType == "isReadyToRelease"
-      ? `[✅ `
+      ? `[✅`
       : `[❌ `
-  }${lineObj.US.statusType == "isProd" ? `` : lineObj.US.statusJira}]`;
+  }${lineObj.US.statusType === "isProd"  || lineObj.US.statusType === "isReadyToRelease" ? `` : lineObj.US.statusJira}]`;
 
   if (result.tasks)
     for (const task of result.tasks) {
       task.statusText = `${
         task.statusType === "isReadyToRelease"
-          ? `✅ ${task.statusJira}`
+          ? `✅`
           : task.statusType === "isProd"
           ? `👌`
           : `👎 ${task.statusJira} @${task.assignee}`
