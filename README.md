@@ -32,7 +32,7 @@ Check-release uses [standard-version](https://www.npmjs.com/package/standard-ver
 ### Setting up .env file
 
 You need to add the following entries in your env or in a .env file located in the current folder. 
-For all of the 'STATUS' in the env variable, you can set many of them if you delimit them with commas.
+For all of the 'STATUS' in the env variable, you can set many of them, the script will compare env entries with US/tasks status with `includes()`. They are case insensitive.
 ⚠️ Caution: the Jira API uses the language set in the Jira app. Be mindful of that when setting the following Jira status values.
 
 ```
@@ -68,7 +68,7 @@ You can apply the following options :
 
 ```
 --onlyWarnings or -w : will only show warnings.
---table or -t : will display output as a table (see table.log())
+--table or -t : will display output as a table (see console.table())
 --disableChecks or -d : will only display standard-version output without comparing it to Jira.
 ```
 
