@@ -1,10 +1,7 @@
-![Illustration](assets/jira-standard-version-release-check-1.png)
-![Illustration tab](assets/jira-standard-version-release-check-2.png)
-
+![Illustration tab](assets/check-release.gif)
 # jira-standard-version-release-check
 
 A small tool to easily check if commits related to a User Story and their task is ready to be released in production for a scrum project.
-
 ## What can I do with check-release ?
 
 The tools provided by this library will allow you to:
@@ -98,17 +95,15 @@ You might encounter the following errors:
 
 ### Output formatting
 
+
+All possible outputs:
+![All possible output](assets/normal.png)
+Table output: 
+![Tab output](assets/table.png)
 ```
 [<US STATUS EMOJI> <US STATUS (if not in prod)>] @<ASSIGNEE (if is not ready)> <US TITLE>]
 < List of tasks (if not in prod):
 (<task status emoji> <task title> @<assignee (if is not ready)> <task key>)
 >
 <Link to US (if ready)>
-```
-
-```
-┌─────────┬──────────────────────┬──────────┬────────────────┐
-│ (index) │       USstatus       │ USNumber │   USTitle      │
-├─────────┼──────────────────────┼──────────┼───────────────-┤
-└─────────┴──────────────────────┴──────────┴────────────────┘
 ```
