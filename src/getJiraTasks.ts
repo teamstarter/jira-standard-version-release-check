@@ -18,10 +18,14 @@ export function getUs(issue: Issue, warning?: WarningTypes) {
 
   if (statusName) {
     if (process.env.JIRA_US_RELEASE_STATUS)
-      isUsInProd = process.env.JIRA_US_RELEASE_STATUS.includes(statusName);
+      isUsInProd = process.env.JIRA_US_RELEASE_STATUS.toLowerCase().includes(
+        statusName.toLowerCase()
+      );
     if (process.env.JIRA_US_READY_TO_RELEASE_STATUS)
       isUsReady =
-        process.env.JIRA_US_READY_TO_RELEASE_STATUS.includes(statusName);
+        process.env.JIRA_US_READY_TO_RELEASE_STATUS.toLowerCase().includes(
+          statusName.toLowerCase()
+        );
   }
   let status: StatusTypes = "isNotOk";
   let color = _gASCII.colorNotReady;
@@ -69,9 +73,13 @@ export async function getSingleSubtask(sub: Issue) {
   if (statusName) {
     if (process.env.JIRA_TASK_READY_TO_RELEASE_STATUS)
       isReady =
-        process.env.JIRA_TASK_READY_TO_RELEASE_STATUS.includes(statusName);
+        process.env.JIRA_TASK_READY_TO_RELEASE_STATUS.toLowerCase().includes(
+          statusName.toLowerCase()
+        );
     if (process.env.JIRA_TASK_RELEASE_STATUS)
-      isProd = process.env.JIRA_TASK_RELEASE_STATUS.includes(statusName);
+      isProd = process.env.JIRA_TASK_RELEASE_STATUS.toLowerCase().includes(
+        statusName.toLowerCase()
+      );
   }
   let status: StatusTypes = "isNotOk";
   let color = _gASCII.colorNotReady;

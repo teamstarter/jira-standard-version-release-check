@@ -2,3 +2,7 @@ node_modules
 .env
 dist
 CHANGELOG.md
+config.yml
+gif.yml
+output_normal
+output_table

@@ -1,10 +1,7 @@
-![Illustration](assets/jira-standard-version-release-check-1.png)
-![Illustration tab](assets/jira-standard-version-release-check-2.png)
-
+![Illustration tab](assets/check-release.gif)
 # jira-standard-version-release-check
 
 A small tool to easily check if commits related to a User Story and their task is ready to be released in production for a scrum project.
-
 ## What can I do with check-release ?
 
 The tools provided by this library will allow you to:
@@ -32,7 +29,7 @@ Check-release uses [standard-version](https://www.npmjs.com/package/standard-ver
 ### Setting up .env file
 
 You need to add the following entries in your env or in a .env file located in the current folder. 
-For all of the 'STATUS' in the env variable, you can set many of them if you delimit them with commas.
+For all of the 'STATUS' in the env variable, you can set many of them, the script will compare env entries with US/tasks status with `includes()`. They are case insensitive.
 ⚠️ Caution: the Jira API uses the language set in the Jira app. Be mindful of that when setting the following Jira status values.
 
 ```
@@ -68,7 +65,7 @@ You can apply the following options :
 
 ```
 --onlyWarnings or -w : will only show warnings.
---table or -t : will display output as a table (see table.log())
+--table or -t : will display output as a table (see console.table())
 --disableChecks or -d : will only display standard-version output without comparing it to Jira.
 ```
 
@@ -98,17 +95,15 @@ You might encounter the following errors:
 
 ### Output formatting
 
+
+All possible outputs:
+![All possible output](assets/normal.png)
+Table output: 
+![Tab output](assets/table.png)
 ```
 [<US STATUS EMOJI> <US STATUS (if not in prod)>] @<ASSIGNEE (if is not ready)> <US TITLE>]
 < List of tasks (if not in prod):
 (<task status emoji> <task title> @<assignee (if is not ready)> <task key>)
 >
 <Link to US (if ready)>
-```
-
-```
-┌─────────┬──────────────────────┬──────────┬────────────────┐
-│ (index) │       USstatus       │ USNumber │   USTitle      │
-├─────────┼──────────────────────┼──────────┼───────────────-┤
-└─────────┴──────────────────────┴──────────┴────────────────┘
 ```
