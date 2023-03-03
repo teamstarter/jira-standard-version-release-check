@@ -41,6 +41,7 @@ JIRA_TASK_READY_TO_RELEASE_STATUS=
 JIRA_TASK_RELEASE_STATUS=
 JIRA_SUBDOMAIN=
 JIRA_PROJECT_KEY=
+CONFIG_SUBTASKS="true"
 ```
 
 - `JIRA_ACCOUNT_TOKEN` is the token you have to [generate on your atlassian profile](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/#Create-an-API-token).
@@ -48,8 +49,9 @@ JIRA_PROJECT_KEY=
 - `JIRA_US_RELEASE_STATUS` is the status on Jira that you consider is "released" for US.
 - `JIRA_TASK_READY_TO_RELEASE_STATUS` is the status on Jira that you consider is "ready to release" for tasks.
 - `JIRA_TASK_RELEASE_STATUS` is the status on Jira that you consider is "released" for task.
-- `JIRA_SUBDOMAIN` is the subdomain name of your organization when you connect on Jira (like so `<JIRA_SUBDOMAIN>.atlassian.net`)
-- `JIRA_PROJECT_KEY` is the project key on Jira (which is typically the shorthand version of the project's name)
+- `JIRA_SUBDOMAIN` is the subdomain name of your organization when you connect on Jira (like so `<JIRA_SUBDOMAIN>.atlassian.net`).
+- `JIRA_PROJECT_KEY` is the project key on Jira (which is typically the shorthand version of the project's name).
+- `CONFIG_SUBTASKS="true"` change to false if your project doesn't use subtasks.
 
 ### Setting up your git commits
 

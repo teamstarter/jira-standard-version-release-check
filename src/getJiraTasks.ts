@@ -12,7 +12,7 @@ import { SOptions } from "./setUpOptions";
 export function getUs(issue: Issue, warning?: WarningTypes) {
   const options = SOptions.getOptions();
   const statusName = issue.fields.status.name;
-  const assigneeName = issue.fields.creator.displayName;
+  const assigneeName = issue.fields.assignee?.displayName;
   let isUsInProd = false;
   let isUsReady = false;
 

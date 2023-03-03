@@ -90,7 +90,7 @@ export async function getLine(line: string) {
     };
     return result;
   }
-  if (
+  if ( process.env.CONFIG_SUBTASKS === "false" ||
     (issue.fields.subtasks && issue.fields.subtasks.length > 0) ||
     !issue?.fields?.parent?.key
   ) {
