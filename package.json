@@ -1,6 +1,6 @@
 {
   "name": "@teamstarter/jira-standard-version-release-check",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "A small tool to easily check if commits related to a User Story and their task is ready to be released in production.",
   "main": "dist/checkForRelease.js",
   "types": "dist/types/*",
@@ -18,7 +18,7 @@
     "release": "standard-version",
     "dev": "CHECK_RELEASE_ENV=dev USE_CHANGELOG_ENV=true ts-node ./src/checkForRelease.ts",
     "prod": "npm run clean && tsc && node ./bin/check-release.js",
-    "debug": "CHECK_RELEASE_ENV=dev USE_CHANGELOG_ENV=true node --inspect -r ts-node/register ./src/checkForRelease.ts",
+    "debug": "CHECK_RELEASE_ENV=dev USE_CHANGELOG_ENV=true node --inspect-brk -r ts-node/register ./src/checkForRelease.ts",
     "compile": "npm run clean && tsc",
     "go-publish": "npm run compile && npm publish --access=public",
     "clean": "rm -rf dist/*",
