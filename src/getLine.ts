@@ -45,7 +45,7 @@ async function issueIsSub(issue: Issue) {
   }
 }
 
-export async function getLine(line: string, lineNumber: number) {
+export async function getLine(line: string) {
   const client = await SClient.getClient();
 
   if (!line) {
@@ -57,9 +57,6 @@ export async function getLine(line: string, lineNumber: number) {
     };
     return result;
   }
-  // Line of the changelog version number
-  if (lineNumber === 3)
-    console.log(line);
   const issueId = getJiraUSFromText(line);
   if (!issueId) {
     if (line.search(/:\*\*/) !== -1) {

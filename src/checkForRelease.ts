@@ -39,13 +39,10 @@ async function useLocalChangelog() {
     input: fs.createReadStream(user_file),
   });
   let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
-  let lineNumber = 1;
   for await (const line of r) {
     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
-      line, lineNumber
+      line
     );
-    if (line)
-      lineNumber++;
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
@@ -73,15 +70,12 @@ async function useStandardVersion() {
   });
   // // Release the interception of the console
   process.stdout.write = outputOrigin;
-
+  
   let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
-  let lineNumber = 1;
   for (const line of interceptedContent[0].split("\n")) {
     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
-      line, lineNumber
-    );
-    if (line)
-      lineNumber++;
+      line
+      );
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
