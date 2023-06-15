@@ -1,4 +1,3 @@
-import { _gASCII } from "./globals/globals";
 import {
   ILine,
   ILineNoUS,

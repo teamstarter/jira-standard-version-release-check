@@ -1,7 +1,6 @@
 import { Issue } from "jira.js/out/version3/models/issue";
 import { getUs, getSubtasks } from "./getJiraTasks";
 import { getJiraUSFromText } from "./getJiraUSFromText";
-import { _gASCII } from "./globals/globals";
 import {
   ILine,
   ILineEmpty,
@@ -10,19 +9,18 @@ import {
   IUserStory,
 } from "./globals/interfaces";
 import { SClient } from "./setUpJiraClient";
-import { SOptions } from "./setUpOptions";
 
-async function issueIsUS(issue: Issue) {
+async function issueIsUS(issue: Issue, outputFormat: any) {
   if (!issue) throw new Error();
-  const userStory: IUserStory = getUs(issue);
+  const userStory: IUserStory = getUs(issue, outputFormat);
   let subtasks: ISubtask[] = [];
 
-  if (userStory.showSubtasks) subtasks = await getSubtasks(issue);
+  if (userStory.showSubtasks) subtasks = await getSubtasks(issue, outputFormat);
   const result: ILine = { lineType: "ILine", US: userStory, tasks: subtasks };
   return result;
 }
 
-async function issueIsSub(issue: Issue) {
+async function issueIsSub(issue: Issue, outputFormat: any) {
   const client = await SClient.getClient();
   try {
     const parentIssue = await client.issues.getIssue({
@@ -30,7 +28,7 @@ async function issueIsSub(issue: Issue) {
     });
     let subtask: ISubtask[] = [];
 
-    const userStory: IUserStory = getUs(parentIssue, "USIsTask");
+    const userStory: IUserStory = getUs(parentIssue, outputFormat, "USIsTask");
     userStory.warningTaskNumber = issue.key;
     const result: ILine = { lineType: "ILine", US: userStory, tasks: subtask };
     return result;
@@ -38,22 +36,22 @@ async function issueIsSub(issue: Issue) {
     const result: ILineNoUS = {
       lineType: "ILineNoUS",
       warningType: "FetchErr",
-      textColor: _gASCII.colorWarning,
-      textMode: _gASCII.modeBold,
+      textColor: outputFormat.colorWarning,
+      textMode: outputFormat.modeBold,
     };
     return result;
   }
 }
 
-export async function getLine(line: string) {
+export async function getLine(line: string, outputFormat: any) {
   const client = await SClient.getClient();
 
   if (!line) {
     const result: ILineEmpty = {
       lineType: "ILineEmpty",
       text: line,
-      textColor: _gASCII.colorDefault,
-      textMode: _gASCII.modeDim,
+      textColor: outputFormat.colorDefault,
+      textMode: outputFormat.modeDim,
     };
     return result;
   }
@@ -64,16 +62,16 @@ export async function getLine(line: string) {
         lineType: "ILineNoUS",
         warningType: "MissUSNb",
         text: line,
-        textColor: _gASCII.colorWarning,
-        textMode: _gASCII.modeBold,
+        textColor: outputFormat.colorWarning,
+        textMode: outputFormat.modeBold,
       };
       return result;
     }
     const result: ILineEmpty = {
       lineType: "ILineEmpty",
       text: line,
-      textColor: _gASCII.colorDefault,
-      textMode: _gASCII.modeDim,
+      textColor: outputFormat.colorDefault,
+      textMode: outputFormat.modeDim,
     };
     return result;
   }
@@ -85,8 +83,8 @@ export async function getLine(line: string) {
       lineType: "ILineNoUS",
       warningType: "WrongUsNumber",
       text: line,
-      textColor: _gASCII.colorWarning,
-      textMode: _gASCII.modeBold,
+      textColor: outputFormat.colorWarning,
+      textMode: outputFormat.modeBold,
     };
     return result;
   }
@@ -94,8 +92,8 @@ export async function getLine(line: string) {
     (issue.fields.subtasks && issue.fields.subtasks.length > 0) ||
     !issue?.fields?.parent?.key
   ) {
-    return await issueIsUS(issue);
+    return await issueIsUS(issue, outputFormat);
   } else if (issue.fields.subtasks.length <= 0) {
-    return await issueIsSub(issue);
+    return await issueIsSub(issue, outputFormat);
   }
 }

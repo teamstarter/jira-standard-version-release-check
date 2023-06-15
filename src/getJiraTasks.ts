@@ -1,5 +1,4 @@
 import { Issue } from "jira.js/out/version3/models/issue";
-import { _gASCII } from "./globals/globals";
 import {
   ISubtask,
   IUserStory,
@@ -9,7 +8,7 @@ import {
 import { SClient } from "./setUpJiraClient";
 import { SOptions } from "./setUpOptions";
 
-export function getUs(issue: Issue, warning?: WarningTypes) {
+export function getUs(issue: Issue, outputFormat: any, warning?: WarningTypes) {
   const options = SOptions.getOptions();
   const statusName = issue.fields.status.name;
   const assigneeName = issue.fields.assignee?.displayName;
@@ -28,14 +27,14 @@ export function getUs(issue: Issue, warning?: WarningTypes) {
         );
   }
   let status: StatusTypes = "isNotOk";
-  let color = _gASCII.colorNotReady;
+  let color = outputFormat.colorNotReady;
 
   if (isUsReady) {
     status = "isReadyToRelease";
-    color = _gASCII.colorReady;
+    color = outputFormat.colorReady;
   } else if (isUsInProd) {
     status = "isProd";
-    color = _gASCII.colorNoAction;
+    color = outputFormat.colorNoAction;
   }
   let showTasks: boolean = true;
 
@@ -56,13 +55,13 @@ export function getUs(issue: Issue, warning?: WarningTypes) {
     assignee: assigneeName ? assigneeName : "no-assignee",
     title: issue.fields.summary,
     textColor: color,
-    textMode: _gASCII.modeBold,
+    textMode: outputFormat.modeBold,
     link: makeLink(issue.key),
   };
   return result;
 }
 
-export async function getSingleSubtask(sub: Issue) {
+export async function getSingleSubtask(sub: Issue, outputFormat: any) {
   const statusName = sub.fields.status.name;
   let assigneeName;
   const options = SOptions.getOptions();
@@ -82,14 +81,14 @@ export async function getSingleSubtask(sub: Issue) {
       );
   }
   let status: StatusTypes = "isNotOk";
-  let color = _gASCII.colorNotReady;
+  let color = outputFormat.colorNotReady;
 
   if (isReady) {
     status = "isReadyToRelease";
-    color = _gASCII.colorReady;
+    color = outputFormat.colorReady;
   } else if (isProd) {
     status = "isProd";
-    color = _gASCII.colorNoAction;
+    color = outputFormat.colorNoAction;
   }
 
   if (!isReady) {
@@ -108,16 +107,16 @@ export async function getSingleSubtask(sub: Issue) {
     assignee: assigneeName ? assigneeName : "no-assignee",
     number: sub.key,
     textColor: color,
-    textMode: _gASCII.modeDim,
+    textMode: outputFormat.modeDim,
   };
   return result;
 }
 
-export async function getSubtasks(issue: Issue) {
+export async function getSubtasks(issue: Issue, outputFormat: any) {
   const subtasks: ISubtask[] = [];
 
   for await (const sub of issue.fields.subtasks) {
-    subtasks.push(await getSingleSubtask(sub));
+    subtasks.push(await getSingleSubtask(sub, outputFormat));
   }
   return subtasks;
 }

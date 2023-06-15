@@ -10,3 +10,16 @@ export const _gASCII = {
   colorDefault: "39m",
   modeEscape: "\x1b[0m",
 };
+
+export const _gMarkdown = {
+  modeDefault: "",
+  modeBold: "**",
+  modeDim: "*",
+  modeLink: "",
+  colorReady: "<span style=\"color: green;\">",
+  colorNotReady: "<span style=\"color: red;\">",
+  colorNoAction: "<span style=\"color: cyan;\">",
+  colorWarning: "<span style=\"color: yellow;\">",
+  colorDefault: "<span style=\"color:;\">",
+  modeEscape: "</span>",
+};
