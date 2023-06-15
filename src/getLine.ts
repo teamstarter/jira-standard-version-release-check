@@ -61,7 +61,7 @@ export async function getLine(line: string, outputFormat: any) {
       const result: ILineNoUS = {
         lineType: "ILineNoUS",
         warningType: "MissUSNb",
-        text: line,
+        text: line.substring(2),
         textColor: outputFormat.colorWarning,
         textMode: outputFormat.modeBold,
       };
@@ -82,7 +82,7 @@ export async function getLine(line: string, outputFormat: any) {
     const result: ILineNoUS = {
       lineType: "ILineNoUS",
       warningType: "WrongUsNumber",
-      text: line,
+      text: line.substring(2),
       textColor: outputFormat.colorWarning,
       textMode: outputFormat.modeBold,
     };

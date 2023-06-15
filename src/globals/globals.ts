@@ -13,8 +13,8 @@ export const _gASCII = {
 
 export const _gMarkdown = {
   modeDefault: "",
-  modeBold: "**",
-  modeDim: "*",
+  modeBold: "",
+  modeDim: "",
   modeLink: "",
   colorReady: "<span style=\"color: green;\">",
   colorNotReady: "<span style=\"color: red;\">",
