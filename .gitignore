@@ -1,6 +1,6 @@
 node_modules
 .env
-dist
+# dist
 CHANGELOG.md
 config.yml
 gif.yml
