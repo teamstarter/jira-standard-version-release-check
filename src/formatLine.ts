@@ -1,4 +1,4 @@
-import { _gASCII } from "./globals/globals";
+import { debug } from "console";
 import {
   ILine,
   ILineNoUS,
@@ -21,6 +21,7 @@ const formatNoUS = (lineObj: ILineNoUS) => {
 const formatILine = (lineObj: ILine) => {
   const result: ILine = lineObj;
 
+  debugger;
   if (result.US.warningType == "USIsTask") {
     result.US.warningText = `[👮‍ ${lineObj.US.warningTaskNumber} is a TASK]`;
   }
@@ -52,7 +53,6 @@ const formatILineEmpty = (lineObj: ILineEmpty) => {
 export const formatLine = (
   lineObj: ILine | ILineNoUS | ILineEmpty | undefined
 ) => {
-
   if (isILineEmpty(lineObj)) return formatILineEmpty(lineObj);
   if (isILineNoUS(lineObj)) return formatNoUS(lineObj);
   if (isILine(lineObj)) return formatILine(lineObj);

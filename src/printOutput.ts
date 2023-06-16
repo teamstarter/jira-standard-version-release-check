@@ -1,4 +1,3 @@
-import { _gASCII } from "./globals/globals";
 import {
   ILine,
   ILineNoUS,
@@ -10,34 +9,34 @@ import {
 } from "./globals/interfaces";
 import { SOptions } from "./setUpOptions";
 
-const printRegular = (
+const printRegular: any = (
   output: (ILine | ILineNoUS | ILineEmpty | undefined)[],
-  isWarning: boolean
+  isWarning: boolean, outputFormat: any
 ) => {
   for (const lineObj of output) {
     let formatedLine: string = "";
     if (isILineNoUS(lineObj)) {
-      formatedLine = `${lineObj.textMode}${lineObj.textColor}${lineObj.warningText}${_gASCII.modeEscape} ${lineObj.text}`;
+      formatedLine = `${lineObj.textMode}${lineObj.textColor}${lineObj.warningText}${outputFormat.modeEscape} ${lineObj.text}`;
     } else if (isILine(lineObj)) {
       if (lineObj.US.warningType)
-        formatedLine = `${_gASCII.modeBold}${_gASCII.colorWarning}${lineObj.US.warningText}${_gASCII.modeEscape} `;
+        formatedLine = `${outputFormat.modeBold}${outputFormat.colorWarning}${lineObj.US.warningText}${outputFormat.modeEscape} `;
       if (!isWarning) {
         formatedLine += `${lineObj.US.textMode}${lineObj.US.textColor}${
           lineObj.US.statusText
         } ${lineObj.US.number} |${
           lineObj.US.statusType === "isNotOk" ? ` @${lineObj.US.assignee}` : ``
-        } ${lineObj.US.title}${_gASCII.modeEscape}`;
+        } ${lineObj.US.title}${outputFormat.modeEscape}`;
 
         if (lineObj.tasks && lineObj.tasks.length > 0) {
           formatedLine += `\n`;
           for (const subtask of lineObj.tasks) {
-            formatedLine += `${subtask.textMode}${subtask.textColor}(${subtask.statusText} ${subtask.number})${_gASCII.modeEscape}`;
+            formatedLine += `${subtask.textMode}${subtask.textColor}(${subtask.statusText} ${subtask.number})${outputFormat.modeEscape}`;
           }
           formatedLine += `\n`;
         }
         if (lineObj.US.statusType === "isNotOk") {
           if (formatedLine.slice(-1) !== `\n`) formatedLine += `\n`;
-          formatedLine += `${_gASCII.modeDim}${_gASCII.colorDefault}${lineObj.US.link}${_gASCII.modeEscape}\n`;
+          formatedLine += `${outputFormat.modeDim}${outputFormat.colorDefault}${lineObj.US.link}${outputFormat.modeEscape}\n`;
         }
       }
     }
@@ -45,7 +44,7 @@ const printRegular = (
   }
 };
 
-const printTab = (
+const printTab: any = (
   output: (ILine | ILineNoUS | ILineEmpty | undefined)[],
   isWarning: boolean
 ) => {
@@ -83,11 +82,11 @@ const printTab = (
 };
 
 export const printOutput = (
-  output: (ILine | ILineNoUS | ILineEmpty | undefined)[] | undefined
+  output: (ILine | ILineNoUS | ILineEmpty | undefined)[] | undefined, outputFormat: any
 ) => {
   if (output === undefined) return;
   const options = SOptions.getOptions();
   if (options.table) {
     printTab(output, options.onlyWarnings);
-  } else printRegular(output, options.onlyWarnings);
+  } else printRegular(output, options.onlyWarnings, outputFormat);
 };

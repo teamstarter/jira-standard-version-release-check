@@ -7,6 +7,7 @@ import { ILine, ILineEmpty, ILineNoUS } from "./globals/interfaces";
 import { formatLine } from "./formatLine";
 import { printOutput } from "./printOutput";
 import { SOptions } from "./setUpOptions";
+import { _gASCII, _gMarkdown } from "./globals/globals";
 
 if (process.env.CHECK_RELEASE_ENV && process.env.CHECK_RELEASE_ENV === "dev") {
   main();
@@ -26,8 +27,16 @@ if (process.env.CHECK_RELEASE_ENV && process.env.CHECK_RELEASE_ENV === "dev") {
   };
 }
 
+function defineOutputFormat () {
+  const options = SOptions.getOptions();
+  if (options.genMarkdown) return _gMarkdown;
+  else return _gASCII;
+}
+
 async function useLocalChangelog() {
   const options = SOptions.getOptions();
+  const outputFormat: any = defineOutputFormat();
+
   if (!process.env.CHANGELOG_FILE)
     throw new Error("Please set CHANGELOG_FILE variable in .env.");
   if (!fs.existsSync(process.env.CHANGELOG_FILE))
@@ -41,16 +50,17 @@ async function useLocalChangelog() {
   let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
   for await (const line of r) {
     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
-      line
+      line, outputFormat
     );
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
-  if (!options.disableChecks) printOutput(consoleOutputArray);
+  if (!options.disableChecks) printOutput(consoleOutputArray, outputFormat);
 }
 
 async function useStandardVersion() {
   const options = SOptions.getOptions();
+  const outputFormat: any = defineOutputFormat();
   // standard version do not provide a way to get the output
   // So we intercept it!
   const interceptedContent: String[] = [];
@@ -74,10 +84,10 @@ async function useStandardVersion() {
   let consoleOutputArray: (ILine | ILineNoUS | ILineEmpty | undefined)[] = [];
   for (const line of interceptedContent[0].split("\n")) {
     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
-      line
+      line, outputFormat
       );
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
-  if (!options.disableChecks) printOutput(consoleOutputArray);
+  if (!options.disableChecks) printOutput(consoleOutputArray, outputFormat);
 }

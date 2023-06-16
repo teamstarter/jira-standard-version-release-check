@@ -9,6 +9,7 @@ export const SOptions = (function () {
       onlyWarnings: { type: Boolean, alias: "w" },
       table: { type: Boolean, alias: "t" },
       disableChecks: { type: Boolean, alias: "d" },
+      genMarkdown: { type: Boolean, alias: "m" },
     });
     return options;
   }
