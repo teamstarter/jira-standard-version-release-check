@@ -6,6 +6,7 @@ exports.SOptions = (function () {
     let options;
     function setOptions() {
         const options = (0, ts_command_line_args_1.parse)({
+            launchPreProd: { type: Boolean, alias: "p" },
             onlyWarnings: { type: Boolean, alias: "w" },
             table: { type: Boolean, alias: "t" },
             disableChecks: { type: Boolean, alias: "d" },

@@ -26,12 +26,14 @@ function getUs(issue, outputFormat, warning) {
     const assigneeName = (_a = issue.fields.assignee) === null || _a === void 0 ? void 0 : _a.displayName;
     let isUsInProd = false;
     let isUsReady = false;
+    const usReadyToReleaseStatus = options.launchPreProd ? process.env.JIRA_US_PREPROD_READY_TO_RELEASE_STATUS : process.env.JIRA_US_READY_TO_RELEASE_STATUS;
+    const usReleaseStatus = options.launchPreProd ? process.env.JIRA_US_PREPROD_RELEASE_STATUS : process.env.JIRA_US_RELEASE_STATUS;
     if (statusName) {
-        if (process.env.JIRA_US_RELEASE_STATUS)
-            isUsInProd = process.env.JIRA_US_RELEASE_STATUS.toLowerCase().includes(statusName.toLowerCase());
-        if (process.env.JIRA_US_READY_TO_RELEASE_STATUS)
+        if (usReleaseStatus)
+            isUsInProd = usReleaseStatus.toLowerCase().includes(statusName.toLowerCase());
+        if (usReadyToReleaseStatus)
             isUsReady =
-                process.env.JIRA_US_READY_TO_RELEASE_STATUS.toLowerCase().includes(statusName.toLowerCase());
+                usReadyToReleaseStatus.toLowerCase().includes(statusName.toLowerCase());
     }
     let status = "isNotOk";
     let color = outputFormat.colorNotReady;

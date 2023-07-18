@@ -1,4 +1,5 @@
 export interface IOptionsArguments {
+    launchPreProd: boolean;
     onlyWarnings: boolean;
     table: boolean;
     disableChecks: boolean;
