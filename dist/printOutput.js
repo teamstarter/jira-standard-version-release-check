@@ -13,7 +13,7 @@ const printRegular = (output, isWarning, outputFormat) => {
             if (lineObj.US.warningType)
                 formatedLine = `${outputFormat.modeBold}${outputFormat.colorWarning}${lineObj.US.warningText}${outputFormat.modeEscape} `;
             if (!isWarning) {
-                formatedLine += `${lineObj.US.textMode}${lineObj.US.textColor}${lineObj.US.statusText} ${lineObj.US.number} |${lineObj.US.statusType === "isNotOk" ? ` @${lineObj.US.assignee}` : ``} ${lineObj.US.title}${outputFormat.modeEscape}`;
+                formatedLine += `${lineObj.US.textMode}${lineObj.US.textColor}${lineObj.US.statusText} ${lineObj.US.number} |${lineObj.US.statusType === "isNotOk" ? ` ${lineObj.US.assignee}` : ``} ${lineObj.US.title}${outputFormat.modeEscape}`;
                 if (lineObj.tasks && lineObj.tasks.length > 0) {
                     formatedLine += `\n`;
                     for (const subtask of lineObj.tasks) {
