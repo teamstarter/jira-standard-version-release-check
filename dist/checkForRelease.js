@@ -125,6 +125,8 @@ function useStandardVersion() {
         let consoleOutputArray = [];
         for (const line of interceptedContent[0].split("\n")) {
             const lineObj = yield (0, getLine_1.getLine)(line, outputFormat);
+            if (lineObj === undefined)
+                continue;
             if (options.disableChecks)
                 console.log(line);
             else

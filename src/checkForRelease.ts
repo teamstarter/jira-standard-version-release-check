@@ -87,6 +87,7 @@ async function useStandardVersion() {
     const lineObj: ILine | ILineNoUS | ILineEmpty | undefined = await getLine(
       line, outputFormat
       );
+    if (lineObj === undefined) continue;
     if (options.disableChecks) console.log(line);
     else consoleOutputArray.push(formatLine(lineObj));
   }
