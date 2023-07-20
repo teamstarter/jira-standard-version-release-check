@@ -61,7 +61,7 @@ function getLine(line, outputFormat) {
             jiraStatus = ["Ready for Dev", "In Progress", "To Code Review", "Dev Review Staging", "Designer Review Staging", "PO Review Staging", "Validated Staging"];
         }
         else {
-            jiraStatus = ["Dev Review PreProd", "Validated Dev PreProd", "Merged in Prod"];
+            jiraStatus = ["Dev Review PreProd", "Validated Dev PreProd"];
         }
         if (!line) {
             const result = {

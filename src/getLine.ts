@@ -56,7 +56,7 @@ export async function getLine(line: string, outputFormat: any) {
   }
   else
   {
-    jiraStatus = ["Dev Review PreProd", "Validated Dev PreProd", "Merged in Prod"]
+    jiraStatus = ["Dev Review PreProd", "Validated Dev PreProd"]
   }
 
   if (!line) {
