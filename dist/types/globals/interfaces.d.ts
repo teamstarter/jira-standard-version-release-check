@@ -4,6 +4,7 @@ export interface IOptionsArguments {
     table: boolean;
     disableChecks: boolean;
     genMarkdown: boolean;
+    doTransition: boolean;
 }
 export interface IRow {
     USstatus: string;

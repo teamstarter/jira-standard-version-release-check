@@ -77,6 +77,8 @@ function useLocalChangelog() {
                 try {
                     const line = _c;
                     const lineObj = yield (0, getLine_1.getLine)(line, outputFormat);
+                    if (lineObj === undefined)
+                        continue;
                     if (options.disableChecks)
                         console.log(line);
                     else

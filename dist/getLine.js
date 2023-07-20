@@ -13,6 +13,7 @@ exports.getLine = void 0;
 const getJiraTasks_1 = require("./getJiraTasks");
 const getJiraUSFromText_1 = require("./getJiraUSFromText");
 const setUpJiraClient_1 = require("./setUpJiraClient");
+const setUpOptions_1 = require("./setUpOptions");
 function issueIsUS(issue, outputFormat) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!issue)
@@ -53,6 +54,15 @@ function getLine(line, outputFormat) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const client = yield setUpJiraClient_1.SClient.getClient();
+        const options = yield setUpOptions_1.SOptions.getOptions();
+        const usReadyToReleaseStatus = options.launchPreProd ? process.env.JIRA_US_PREPROD_READY_TO_RELEASE_STATUS : process.env.JIRA_US_READY_TO_RELEASE_STATUS;
+        let jiraStatus = [];
+        if (options.launchPreProd) {
+            jiraStatus = ["Ready for Dev", "In Progress", "To Code Review", "Dev Review Staging", "Designer Review Staging", "PO Review Staging", "Validated Staging"];
+        }
+        else {
+            jiraStatus = ["Dev Review PreProd", "Validated Dev PreProd", "Merged in Prod"];
+        }
         if (!line) {
             const result = {
                 lineType: "ILineEmpty",
@@ -95,6 +105,28 @@ function getLine(line, outputFormat) {
                 textMode: outputFormat.modeBold,
             };
             return result;
+        }
+        if (!jiraStatus.includes(issue.fields.status.name)) {
+            return undefined;
+        }
+        if (options.doTransition && usReadyToReleaseStatus && issue.fields.status.name === usReadyToReleaseStatus) {
+            let transitions;
+            try {
+                transitions = yield client.issues.getTransitions({ issueIdOrKey: issueId });
+                if (transitions && transitions.transitions) {
+                    yield client.issues.doTransition({
+                        issueIdOrKey: issueId,
+                        transition: {
+                            id: transitions.transitions[2].id,
+                        },
+                    });
+                }
+                else
+                    throw new Error("Not enough transitions");
+            }
+            catch (err) {
+                console.log(err);
+            }
         }
         if (process.env.CONFIG_SUBTASKS === "false" ||
             (issue.fields.subtasks && issue.fields.subtasks.length > 0) ||
