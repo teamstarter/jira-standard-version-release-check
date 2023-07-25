@@ -9,6 +9,7 @@ import {
   IUserStory,
 } from "./globals/interfaces";
 import { SClient } from "./setUpJiraClient";
+import { SOptions } from "./setUpOptions";
 
 async function issueIsUS(issue: Issue, outputFormat: any) {
   if (!issue) throw new Error();
@@ -45,6 +46,18 @@ async function issueIsSub(issue: Issue, outputFormat: any) {
 
 export async function getLine(line: string, outputFormat: any) {
   const client = await SClient.getClient();
+  const options = await SOptions.getOptions();
+  const usReadyToReleaseStatus = options.launchPreProd ? process.env.JIRA_US_PREPROD_READY_TO_RELEASE_STATUS : process.env.JIRA_US_READY_TO_RELEASE_STATUS;
+  let jiraStatus = []
+
+  if (options.launchPreProd)
+  {
+    jiraStatus = ["Ready for Dev", "In Progress", "To Code Review", "Dev Review Staging", "Designer Review Staging", "PO Review Staging", "Validated Staging"]
+  }
+  else
+  {
+    jiraStatus = ["Dev Review PreProd", "Validated Dev PreProd"]
+  }
 
   if (!line) {
     const result: ILineEmpty = {
@@ -87,6 +100,28 @@ export async function getLine(line: string, outputFormat: any) {
       textMode: outputFormat.modeBold,
     };
     return result;
+  }
+  if (!jiraStatus.includes(issue.fields.status.name as string))
+  {
+    return undefined
+  }
+  if (options.doTransition && usReadyToReleaseStatus && issue.fields.status.name === usReadyToReleaseStatus) {
+    let transitions
+    try {
+        transitions = await client.issues.getTransitions({ issueIdOrKey: issueId });
+        if (transitions && transitions.transitions)
+        {
+          await client.issues.doTransition({
+              issueIdOrKey: issueId,
+              transition: {
+                  id: transitions.transitions[2].id,
+                },
+              });
+        }
+              else throw new Error("Not enough transitions")
+            } catch (err) {
+                console.log(err);
+              }
   }
   if ( process.env.CONFIG_SUBTASKS === "false" ||
     (issue.fields.subtasks && issue.fields.subtasks.length > 0) ||

@@ -24,7 +24,7 @@ const printRegular: any = (
         formatedLine += `${lineObj.US.textMode}${lineObj.US.textColor}${
           lineObj.US.statusText
         } ${lineObj.US.number} |${
-          lineObj.US.statusType === "isNotOk" ? ` @${lineObj.US.assignee}` : ``
+          lineObj.US.statusType === "isNotOk" ? ` ${lineObj.US.assignee}` : ``
         } ${lineObj.US.title}${outputFormat.modeEscape}`;
 
         if (lineObj.tasks && lineObj.tasks.length > 0) {

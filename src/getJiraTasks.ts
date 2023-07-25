@@ -14,15 +14,17 @@ export function getUs(issue: Issue, outputFormat: any, warning?: WarningTypes) {
   const assigneeName = issue.fields.assignee?.displayName;
   let isUsInProd = false;
   let isUsReady = false;
+  const usReadyToReleaseStatus = options.launchPreProd ? process.env.JIRA_US_PREPROD_READY_TO_RELEASE_STATUS : process.env.JIRA_US_READY_TO_RELEASE_STATUS;
+  const usReleaseStatus = options.launchPreProd ? process.env.JIRA_US_PREPROD_RELEASE_STATUS : process.env.JIRA_US_RELEASE_STATUS;
 
   if (statusName) {
-    if (process.env.JIRA_US_RELEASE_STATUS)
-      isUsInProd = process.env.JIRA_US_RELEASE_STATUS.toLowerCase().includes(
+    if (usReleaseStatus)
+      isUsInProd = usReleaseStatus.toLowerCase().includes(
         statusName.toLowerCase()
       );
-    if (process.env.JIRA_US_READY_TO_RELEASE_STATUS)
+    if (usReadyToReleaseStatus)
       isUsReady =
-        process.env.JIRA_US_READY_TO_RELEASE_STATUS.toLowerCase().includes(
+      usReadyToReleaseStatus.toLowerCase().includes(
           statusName.toLowerCase()
         );
   }

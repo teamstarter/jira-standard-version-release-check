@@ -1,8 +1,10 @@
 export interface IOptionsArguments {
+  launchPreProd: boolean;
   onlyWarnings: boolean;
   table: boolean;
   disableChecks: boolean;
   genMarkdown: boolean;
+  doTransition: boolean;
 }
 
 export interface IRow {
